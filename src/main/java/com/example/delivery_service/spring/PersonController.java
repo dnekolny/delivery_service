@@ -1,8 +1,10 @@
 package com.example.delivery_service.spring;
 
-import com.example.delivery_service.model.Person;
-import com.example.delivery_service.services.PersonService;
+import com.example.delivery_service.model.Role;
+import com.example.delivery_service.model.User;
+import com.example.delivery_service.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,25 +17,34 @@ import javax.validation.Valid;
 @Controller
 public class PersonController {
 
-    private final PersonService personService;
+    private final UserService userService;
+    //private final
 
     @Autowired
-    public PersonController(PersonService personService) {
-        this.personService = personService;
+    public PersonController(UserService userService) {
+        this.userService = userService;
     }
 
     @RequestMapping(value = "/persons", method = RequestMethod.GET)
     public String listPersons(Model model) {
-        model.addAttribute("person", new Person());
-        model.addAttribute("listPersons", this.personService.getAllPersons());
+        model.addAttribute("person", new User());
+        model.addAttribute("listPersons", this.userService.getAllUsers());
+        return "person";
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @RequestMapping(value = "/secure/persons", method = RequestMethod.GET)
+    public String secureListPersons(Model model) {
+        model.addAttribute("person", new User());
+        model.addAttribute("listPersons", this.userService.getAllUsers());
         return "person";
     }
 
     //For add and update person both
     @RequestMapping(value= "/person/add", method = RequestMethod.POST)
-    public String addPerson(@Valid @ModelAttribute("person") Person p){
+    public String addPerson(@Valid @ModelAttribute("person") User p){
 
-        this.personService.saveOrUpdate(p);
+        this.userService.saveOrUpdate(p);
 
         return "redirect:/persons";
     }
@@ -41,20 +52,20 @@ public class PersonController {
     @RequestMapping("/remove/{id}")
     public String removePerson(@PathVariable("id") Long id){
 
-        this.personService.removePerson(id);
+        this.userService.removeUser(id);
         return "redirect:/persons";
     }
 
     @RequestMapping("/edit/{id}")
     public String editPerson(@PathVariable("id") Long id, Model model){
-        model.addAttribute("person", this.personService.getPersonById(id));
-        model.addAttribute("listPersons", this.personService.getAllPersons());
+        model.addAttribute("person", this.userService.getUserById(id));
+        model.addAttribute("listPersons", this.userService.getAllUsers());
         return "person";
     }
 
     @RequestMapping("/surname/{surname}")
     public String surnameTest(@PathVariable("surname") String surname, Model model){
-        model.addAttribute("listPersons", this.personService.getBySurname(surname));
+        model.addAttribute("listPersons", this.userService.getBySurname(surname));
 
         return "person";
     }

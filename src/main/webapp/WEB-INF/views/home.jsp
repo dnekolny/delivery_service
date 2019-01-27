@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: David
-  Date: 10.01.2019
-  Time: 21:52
+  Date: 27.01.2019
+  Time: 18:55
   To change this template use File | Settings | File Templates.
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -11,7 +11,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ page session="false" %>
 
-<t:secureLayout title="Persons Test" heading="Persons">
+<t:layout title="Delivery Service">
     <h2>
         Add a Person
     </h2>
@@ -110,4 +110,4 @@
             </c:forEach>
         </table>
     </c:if>
-</t:secureLayout>
+</t:layout>

@@ -1,31 +1,48 @@
 package com.example.delivery_service.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 
 @Entity
-@Table(name="PERSON")
-public class Person {
+//@Table(name="user")
+public class User {
 
     @Id
-    @Column(name="id")
+    //@Column(name="id")
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="name")
+    //@Column(name="name")
     private String name;
 
-    @Column(name="surname")
+    //@Column(name="surname")
     private String surname;
 
-    @Column(name="password")
+    //@Column(name="password")
     private String password;
 
-    @Column(name="email")
+    //@Column(name="email")
     private String email;
 
-    @Column(name = "phone_number")
+    //@Column(name = "phone_number")
     private String phoneNumber;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
+
+    public User() { }
+
+    public User(User user) {
+        this.id = user.getId();
+        this.name = user.getName();
+        this.surname = user.getSurname();
+        this.password = user.getPassword();
+        this.email = user.getEmail();
+        this.phoneNumber = user.getPhoneNumber();
+        this.roles = user.getRoles();
+    }
 
     public Long getId() {
         return id;
@@ -73,5 +90,13 @@ public class Person {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }
