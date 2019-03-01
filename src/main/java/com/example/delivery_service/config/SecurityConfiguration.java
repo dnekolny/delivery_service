@@ -39,8 +39,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("**/secure/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
-                .formLogin().permitAll();
-                //.formLogin().loginPage("/loginpage").permitAll();
+                //.formLogin().permitAll();
+                .formLogin().loginPage("/login").permitAll();
     }
 
     private PasswordEncoder getPasswordEncoder(){

@@ -5,14 +5,14 @@
   Time: 18:46
 --%>
 <%@tag description="Secure Layout Tag" pageEncoding="UTF-8" %>
-<%@attribute name="title" required="true"%>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 
 <head>
 
     <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -26,10 +26,10 @@
     <meta name="msapplication-TileColor" content="#9f00a7">
     <meta name="theme-color" content="#ffffff">
 
-    <title>${title}</title>
+    <title>Delivery Service</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/webjars/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap/4.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom fonts for this template -->
     <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" rel="stylesheet">
@@ -44,8 +44,10 @@
 
 <!-- Navigation -->
 <nav class="navbar navbar-expand-md navbar-light">
-    <img style="width: 50px; margin-right: 10px" src="/img/icon.png">
-    <a class="navbar-brand" style="font-size: 1.8em" href="#">${title}</a>
+    <a class="navbar-brand mr-4 " style="font-size: 1.9em;" href="#">
+        <img style="width: 50px; margin-right: 10px" src="/img/icon.png">
+        Delivery Service
+    </a>
     <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -53,26 +55,26 @@
     <div class="navbar-collapse collapse" id="navbarsExample04" style="">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
+                <a class="nav-link" href="#">Domů</a>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Služby</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown04">
                     <a class="dropdown-item" href="#">Vnitrostátní služby</a>
                     <a class="dropdown-item" href="#">Mezinárodní služby</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
+                    <a class="dropdown-item" href="#">Nadměrné balíky</a>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">O nás</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Kontakt</a>
+            </li>
         </ul>
-        <form class="form-inline my-2 my-md-0">
-            <input class="form-control" type="text" placeholder="Search">
-        </form>
+
+        <a href="/findPackage" class="btn btn-warning mr-2">Najít zásilku</a>
+        <a href="/login" class="btn btn-info">Přihlásit se</a>
     </div>
 </nav>
 
@@ -81,20 +83,14 @@
     <div class="overlay"></div>
     <div class="container">
         <div class="row">
-            <div class="col-xl-9 mx-auto">
-                <h1 class="mb-5">Build a landing page for your business or project and generate more leads!</h1>
+            <div class="col-xl-10 mx-auto">
+                <h1>Pošli balík ihned!</h1>
+            </div>
+            <div class="col-xl-10 mx-auto">
+                <h4 class="mb-3 pt-2 border-top">Vytvoř online objednávku. Jednoduše a rychle.</h4>
             </div>
             <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-                <form>
-                    <div class="form-row">
-                        <div class="col-12 col-md-9 mb-2 mb-md-0">
-                            <input type="email" class="form-control form-control-lg" placeholder="Enter your email...">
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <button type="submit" class="btn btn-block btn-lg btn-primary">Sign up!</button>
-                        </div>
-                    </div>
-                </form>
+                <a class="btn btn-lg btn-primary w-50" href="/newOrder">Pošli balík</a>
             </div>
         </div>
     </div>
@@ -140,21 +136,21 @@
     <div class="container-fluid p-0">
         <div class="row no-gutters">
 
-            <div class="col-lg-6 order-lg-2 text-white showcase-img" style="background-image: url('https://blackrockdigital.github.io/startbootstrap-landing-page/img/bg-showcase-1.jpg');"></div>
+            <div class="col-lg-6 order-lg-2 text-white showcase-img" style="background-position: center; background-image: url('/img/map.jpg');"></div>
             <div class="col-lg-6 order-lg-1 my-auto showcase-text">
                 <h2>Fully Responsive Design</h2>
                 <p class="lead mb-0">When you use a theme created by Start Bootstrap, you know that the theme will look great on any device, whether it's a phone, tablet, or desktop the page will behave responsively!</p>
             </div>
         </div>
         <div class="row no-gutters">
-            <div class="col-lg-6 text-white showcase-img" style="background-image: url('https://blackrockdigital.github.io/startbootstrap-landing-page/img/bg-showcase-2.jpg');"></div>
+            <div class="col-lg-6 text-white showcase-img" style="background-position: center; background-image: url('/img/truck_forest.jpg');"></div>
             <div class="col-lg-6 my-auto showcase-text">
                 <h2>Updated For Bootstrap 4</h2>
                 <p class="lead mb-0">Newly improved, and full of great utility classes, Bootstrap 4 is leading the way in mobile responsive web development! All of the themes on Start Bootstrap are now using Bootstrap 4!</p>
             </div>
         </div>
         <div class="row no-gutters">
-            <div class="col-lg-6 order-lg-2 text-white showcase-img" style="background-image: url('https://blackrockdigital.github.io/startbootstrap-landing-page/img/bg-showcase-3.jpg');"></div>
+            <div class="col-lg-6 order-lg-2 text-white showcase-img" style="background-position: center; background-image: url('/img/truck_volcano.jpg');"></div>
             <div class="col-lg-6 order-lg-1 my-auto showcase-text">
                 <h2>Easy to Use &amp; Customize</h2>
                 <p class="lead mb-0">Landing Page is just HTML and CSS with a splash of SCSS for users who demand some deeper customization options. Out of the box, just add your content and images, and your new landing page will be ready to go!</p>
@@ -166,9 +162,9 @@
 <!-- Testimonials -->
 <section class="testimonials text-center bg-light">
     <div class="container">
-        <h2 class="mb-5">What people are saying...</h2>
+        <h2 class="mb-5">Where to find us...</h2>
         <div class="row">
-            <div class="col-lg-4">
+            <!--<div class="col-lg-4">
                 <div class="testimonial-item mx-auto mb-5 mb-lg-0">
                     <img class="img-fluid rounded-circle mb-3" src="https://blackrockdigital.github.io/startbootstrap-landing-page/img/testimonials-1.jpg" alt="">
                     <h5>Margaret E.</h5>
@@ -188,7 +184,11 @@
                     <h5>Sarah	W.</h5>
                     <p class="font-weight-light mb-0">"Thanks so much for making these free resources available to us!"</p>
                 </div>
-            </div>
+            </div>-->
+
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1276.452162943837!2d15.844030358259506!3d50.21900829486101!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470dd52a923e5c4d%3A0xa3bb9275874e3dba!2zTmEgRHLDocW-a8OhY2ggNTUsIDUwMCAwMyBIcmFkZWMgS3LDoWxvdsOp!5e0!3m2!1scs!2scz!4v1549631405526"
+                    width="1140" height="600" frameborder="0" style="border:0" allowfullscreen>
+            </iframe>
         </div>
     </div>
 </section>
@@ -224,22 +224,22 @@
             <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
                 <ul class="list-inline mb-2">
                     <li class="list-inline-item">
-                        <a href="#">About</a>
+                        <a href="#">O nás</a>
                     </li>
                     <li class="list-inline-item">&sdot;</li>
                     <li class="list-inline-item">
-                        <a href="#">Contact</a>
+                        <a href="#">Kontakt</a>
                     </li>
                     <li class="list-inline-item">&sdot;</li>
                     <li class="list-inline-item">
-                        <a href="#">Terms of Use</a>
+                        <a href="#">Podmínky použití</a>
                     </li>
                     <li class="list-inline-item">&sdot;</li>
                     <li class="list-inline-item">
-                        <a href="#">Privacy Policy</a>
+                        <a href="#">Zásady ochrany osobních údajů</a>
                     </li>
                 </ul>
-                <p class="text-muted small mb-4 mb-lg-0">&copy; Your Website 2018. All Rights Reserved.</p>
+                <p class="text-muted small mb-4 mb-lg-0">&copy; Delivery Service 2018. All Rights Reserved.</p>
             </div>
             <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
                 <ul class="list-inline mb-0">
@@ -266,7 +266,7 @@
 
 <!-- Bootstrap core JavaScript -->
 <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
-<script src="/webjars/bootstrap/4.2.1/js/bootstrap.bundle.min.js"></script>
+<script src="/webjars/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

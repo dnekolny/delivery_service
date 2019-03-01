@@ -13,7 +13,7 @@
     <title>${title}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/webjars/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/webjars/bootstrap/4.3.0/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="/css/secure-style.css" rel="stylesheet">
 
@@ -142,7 +142,7 @@
     </div>
 </div>
 <script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
-<script src="/webjars/bootstrap/4.2.1/js/bootstrap.bundle.min.js"></script>
+<script src="/webjars/bootstrap/4.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="/js/feather.min.js"></script>
 <script>
     feather.replace();

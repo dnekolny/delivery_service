@@ -9,15 +9,15 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-<%@ page session="false" %>
+<%@ page session="false" contentType="text/html; charset=UTF-8" %>
 
-<t:secureLayout title="Persons Test" heading="Persons">
+<t:secureLayout title="Users Test" heading="Users">
     <h2>
-        Add a Person
+        Add a user
     </h2>
 
 
-    <form:form action="/person/add" method="post" modelAttribute="person">
+    <form:form action="/user/add" method="post" modelAttribute="user">
         <table>
             <tr>
                 <td>
@@ -71,13 +71,13 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <c:if test="${!empty person.name}">
+                    <c:if test="${!empty user.name}">
                         <input type="submit"
-                               value="<spring:message text="Edit Person"/>"/>
+                               value="<spring:message text="Edit User"/>"/>
                     </c:if>
-                    <c:if test="${empty person.name}">
+                    <c:if test="${empty user.name}">
                         <input type="submit"
-                               value="<spring:message text="Add Person"/>"/>
+                               value="<spring:message text="Add User"/>"/>
                     </c:if>
                 </td>
             </tr>
@@ -85,8 +85,8 @@
     </form:form>
     <br>
 
-    <h3>Persons List</h3>
-    <c:if test="${!empty listPersons}">
+    <h3>Users List</h3>
+    <c:if test="${!empty listUsers}">
         <table class="tg">
             <tr>
                 <th width="80">ID</th>
@@ -97,15 +97,15 @@
                 <th width="60">Edit</th>
                 <th width="60">Delete</th>
             </tr>
-            <c:forEach items="${listPersons}" var="person">
+            <c:forEach items="${listUsers}" var="user">
                 <tr>
-                    <td>${person.id}</td>
-                    <td>${person.name}</td>
-                    <td>${person.surname}</td>
-                    <td>${person.email}</td>
-                    <td>${person.phoneNumber}</td>
-                    <td><a href="<c:url value='/edit/${person.id}' />">Edit</a></td>
-                    <td><a href="<c:url value='/remove/${person.id}' />">Delete</a></td>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.surname}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phoneNumber}</td>
+                    <td><a href="<c:url value='/edit/${user.id}' />">Edit</a></td>
+                    <td><a href="<c:url value='/remove/${user.id}' />">Delete</a></td>
                 </tr>
             </c:forEach>
         </table>

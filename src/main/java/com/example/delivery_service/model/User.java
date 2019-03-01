@@ -1,6 +1,9 @@
 package com.example.delivery_service.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.Set;
 
 
@@ -13,16 +16,25 @@ public class User {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
+    private Date createDate;
+
+    private Date updateDate;
+
     //@Column(name="name")
+    @NotNull
     private String name;
 
     //@Column(name="surname")
+    @NotNull
     private String surname;
 
     //@Column(name="password")
+    @Size(min = 8)
+    @NotNull
     private String password;
 
     //@Column(name="email")
+    @NotNull
     private String email;
 
     //@Column(name = "phone_number")
@@ -98,5 +110,17 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public Date getCreateDate() { return createDate; }
+
+    public void setCreateDate(Date createDate) { this.createDate = createDate; }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }
