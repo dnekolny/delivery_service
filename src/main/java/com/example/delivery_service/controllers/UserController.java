@@ -1,57 +1,67 @@
-package com.example.delivery_service.spring;
+package com.example.delivery_service.controllers;
 
-import com.example.delivery_service.model.Role;
-import com.example.delivery_service.model.User;
+import com.example.delivery_service.model.Entity.User;
+import com.example.delivery_service.services.RoleService;
 import com.example.delivery_service.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.validation.Valid;
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 
 @Controller
 public class UserController {
 
     private final UserService userService;
-    //private final
+    private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public String listUsers(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("listUsers", this.userService.getAllUsers());
-        return "user";
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @RequestMapping(value = "/secure/users", method = RequestMethod.GET)
     public String secureListUsers(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("listUsers", this.userService.getAllUsers());
+        model.addAttribute("users", this.userService.getAllUsers());
         return "user";
     }
 
     //For add and update user both
     @RequestMapping(value= "/user/add", method = RequestMethod.POST)
-    public String addUser(@Valid @ModelAttribute("user") User p){
+    public String addUser(@Valid @ModelAttribute("user") User p, BindingResult bindingResult){
 
-        p.setCreateDate(new Date());
-        p.setUpdateDate(p.getCreateDate());
-        this.userService.saveOrUpdate(p);
+        if (bindingResult.hasErrors()) {
+            return "login";
+        }
 
-        return "redirect:/users";
+        try {
+            p.setRoles(new HashSet<>(Collections.singletonList(roleService.getRoleByName("CUSTOMER").orElse(null))));
+
+            p.setPassword(passwordEncoder.encode(p.getPassword()));
+
+            p.setCreateDate(new Date());
+            p.setUpdateDate(p.getCreateDate());
+            this.userService.saveOrUpdate(p);
+
+            return "redirect:/users";
+        }
+        catch (Exception ex){
+            return "redirect:/login"; //TODO přidat error messsage
+        }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")

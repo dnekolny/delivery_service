@@ -1,6 +1,6 @@
 package com.example.delivery_service.services;
 
-import com.example.delivery_service.model.User;
+import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.model.UserDetailsImpl;
 import com.example.delivery_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,16 @@ import java.util.Optional;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+    private final UserRepository userRepository;
+
     @Autowired
-    private UserRepository userRepository;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userRepository.findByName(userName);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         optionalUser.orElseThrow(() -> new UsernameNotFoundException("Username not found!!!"));
 

@@ -1,9 +1,7 @@
-package com.example.delivery_service.spring;
+package com.example.delivery_service.controllers;
 
-import com.example.delivery_service.model.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 

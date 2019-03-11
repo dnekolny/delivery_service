@@ -1,0 +1,217 @@
+
+
+  <!--<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> CSRF TOKEN-->
+
+<!DOCTYPE html>
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap Login &amp; Register Templates</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{http://fonts.googleapis.com/css(family='Roboto:400,100,300,500')}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.3.0/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{https://use.fontawesome.com/releases/v5.7.2/css/all.css}" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/signin.css}">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!--Icon-->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/icon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/icon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/icon/favicon-16x16.png">
+    <link rel="manifest" href="/img/icon/site.webmanifest">
+    <link rel="mask-icon" href="/img/icon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#9f00a7">
+    <meta name="theme-color" content="#ffffff">
+
+</head>
+
+<body>
+
+<!-- Top content -->
+<div class="top-content">
+
+     <div class="inner-bg">
+        <div class="container">
+
+            <!--<div th:replace="fragments/header :: header">Header</div>-->
+
+            <div class="row text-center">
+                <div class="col-md-8 col-md-offset-2 text" style="float: none; margin: 0 auto;">
+                    <h1><strong>Přihlášení</strong> a registrace</h1>
+                    <div class="description">
+                        <p>
+                            K přístupu do systému je nutné se nejdříve <strong>přihlásit</strong>.
+                            Pokud zatím nemáte účet je možné se ihned <strong>zaregistrovat</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                 <div class="col-md-5">
+
+                    <div class="form-box">
+                        <div class="form-top">
+                            <div class="form-top-left">
+                                <h3>Přihlášení</h3>
+                                <p>Zadej login a heslo:</p>
+                            </div>
+                            <div class="form-top-right">
+                                <i class="fa fa-key"></i>
+                            </div>
+                        </div>
+                        <div class="form-bottom">
+                            <form role="form" th:action="@{/login}" method="post" class="login-form needs-validation" novalidate>
+                                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <span th:text="#{login.invalid.message}">
+                                        Invalid email or password.
+                                    </span>
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="loginEmail">Email</label>
+                                    <input id="loginEmail" name="email" type="text" placeholder="Email..." class="form-username form-control" required >
+                                    <span class="text-danger invalid-feedback" th:text="#{email.message}">zadejte validní email</span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="loginPassword">Password</label>
+                                    <input id="loginPassword" name="password" type="password" placeholder="Heslo..." class="form-password form-control" required >
+                                           <!--th:classappend="${param.error} ? 'is-invalid'"-->
+                                    <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{password.name})}">jméno je povinné</span>
+                                </div>
+                                <button id="signinButton" type="submit" class="btn btn-primary">Přihlásit se</button>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-1 middle-border"></div>
+                <div class="col-md-1"></div>
+
+                <div class="col-md-5">
+
+                    <div class="form-box">
+                        <div class="form-top">
+                            <div class="form-top-left">
+                                <h3>Registrace</h3>
+                                <p>Vyplň formulář k vytvoření nového uživatele:</p>
+                            </div>
+                            <div class="form-top-right">
+                                <i class="fa fa-pencil-alt"></i>
+                            </div>
+                        </div>
+                        <div class="form-bottom">
+                            <form class="needs-validation" method="post" th:action="@{/user/add}" th:object="${user}" th:fragment="signupForm" novalidate>
+                                <div class="form-group">
+                                    <label for="name" class="sr-only">First name</label>
+                                    <input id="name" type="text" placeholder="Jméno..." class="form-control" th:field="*{name}"
+                                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" required /> <!--th:classappend="${#fields.hasErrors('name')} ? is-invalid : is-valid"-->
+                                    <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{name.name})}">jméno je povinné</span>
+                                    <!--<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
+                                </div>
+                                <div class="form-group">
+                                    <label for="surname" class="sr-only">Last name</label>
+                                    <input id="surname" type="text" placeholder="Příjmení..." class="form-control" th:field="*{surname}"
+                                           th:classappend="${#fields.hasErrors('surname')} ? 'is-invalid'" required />
+                                    <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{surname.name})}">příjmení je povinné</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email" class="sr-only">Email</label>
+                                    <input id="email" type="text" placeholder="Email..." class="form-control" th:field="*{email}"
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" required />
+                                    <span class="text-danger invalid-feedback" th:text="#{email.message}">zadejte validní email</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phoneNumber" class="sr-only">Telephone number</label>
+                                    <input id="phoneNumber" type="text" placeholder="Telefonní číslo..." class="form-control" th:field="*{phoneNumber}" />
+                                </div>
+                                <br>
+                                <div class="form-group">
+                                    <label for="password" class="sr-only">Password</label>
+                                    <input id="password" type="password" placeholder="Heslo..." class="psw form-control" th:field="*{password}"
+                                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required minlength="8"/>
+                                    <span class="text-danger invalid-feedback" th:text="#{size.bigger.then.message('8')}">heslo musí mít minimálně 8 znaků</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password2" class="sr-only">Password again</label>
+                                    <input id="password2" type="password" placeholder="Heslo znovu..." class="psw form-control" />
+                                    <span class="text-danger invalid-feedback" th:text="#{password.notEqual.message}">hesla se neshodují</span>
+                                </div>
+                                <button id="signupButton" type="submit" class="btn btn-warning">Zaregistrovat se</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Javascript -->
+<script src="/webjars/jquery/3.3.1/jquery.min.js"></script>
+<script src="/webjars/bootstrap/4.3.0/js/bootstrap.min.js"></script>
+<script src="/js/jquery.backstretch.min.js"></script>
+<script src="/js/form.validation.js"></script>
+
+<script>
+    jQuery(document).ready(function() {
+        /*Fullscreen background*/
+        $.backstretch("/img/truck_01.jpg");
+
+
+        window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = $('.needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+
+        /**LOGIN VALIDATION*/
+        $('#signinButton').on('click', function () { validateEmail($('#loginEmail')) });
+        $('#loginEmail').on('input', function () { validateEmail($('#loginEmail')) });
+
+        /**REGISTRATION VALIDATION*/
+        $('#signupButton').on('click', function () { validateEmail($('#email')) });
+        $('#email').on('input', function () { validateEmail($('#email')) });
+        $('#signupButton').on('click', function () { comparePasswords($('#password'), $('#password2')) });
+        $('#password').on('input', function () { checkPassword($('#password'), $('#password2')) });
+        $('#password2').on('input', function () { comparePasswords($('#password'), $('#password2')) });
+
+
+
+    });
+</script>
+
+
+</body>
+
+</html>
+
+

@@ -1,4 +1,4 @@
-package com.example.delivery_service.model;
+package com.example.delivery_service.model.Entity;
 
 import javax.persistence.*;
 

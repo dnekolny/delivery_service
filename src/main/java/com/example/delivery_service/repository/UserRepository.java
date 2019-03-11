@@ -1,7 +1,7 @@
 package com.example.delivery_service.repository;
 
 
-import com.example.delivery_service.model.User;
+import com.example.delivery_service.model.Entity.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     List<User> getBySurname(String surname);
 
-    Optional<User> findByName(String name);
+    Optional<User> findByEmail(String email);
 }

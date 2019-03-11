@@ -1,6 +1,6 @@
 package com.example.delivery_service.services;
 
-import com.example.delivery_service.model.User;
+import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,23 +24,23 @@ public class UserService {
         repository.save(p);
     }
 
-
     public List<User> getAllUsers() {
         return (List<User>) repository.findAll();
     }
-
 
     public Optional<User> getUserById(Long id) {
         return repository.findById(id);
     }
 
-
     public void removeUser(Long id) {
         repository.deleteById(id);
     }
 
-
     public List<User> getBySurname(String surname) {
         return repository.getBySurname(surname);
+    }
+
+    public Optional<User> getUserByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }

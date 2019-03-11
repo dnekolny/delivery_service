@@ -1,7 +1,7 @@
 /*package com.example.delivery_service.services;
 
 
-import com.example.delivery_service.model.User;
+import com.example.delivery_service.model.Entity.User;
 
 import java.util.List;
 import java.util.Optional;

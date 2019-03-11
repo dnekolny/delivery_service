@@ -1,39 +1,28 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: David
-  Date: 10.01.2019
-  Time: 21:52
-  To change this template use File | Settings | File Templates.
---%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
-<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-<%@ page session="false" contentType="text/html; charset=UTF-8" %>
+<h1>USERS</h1>
 
-<t:secureLayout title="Users Test" heading="Users">
+<!--<t:secureLayout title="Users Test" heading="Users">
     <h2>
         Add a user
     </h2>
 
 
-    <form:form action="/user/add" method="post" modelAttribute="user">
+    <form action="/user/add" method="post" modelAttribute="user">
         <table>
             <tr>
                 <td>
-                    <form:label path="name">
-                        <spring:message text="Name"/>
-                    </form:label>
+                    <label path="name">
+                        <message text="Name"/>
+                    </label>
                 </td>
                 <td>
-                    <form:input path="name"/>
+                    <input path="name"/>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <form:label path="surname">
-                        <spring:message text="Surname"/>
-                    </form:label>
+                    <label path="surname">
+                        <message text="Surname"/>
+                    </label>
                 </td>
                 <td>
                     <form:input path="surname"/>
@@ -82,7 +71,7 @@
                 </td>
             </tr>
         </table>
-    </form:form>
+    </form>
     <br>
 
     <h3>Users List</h3>
@@ -110,4 +99,4 @@
             </c:forEach>
         </table>
     </c:if>
-</t:secureLayout>
+</t:secureLayout>-->

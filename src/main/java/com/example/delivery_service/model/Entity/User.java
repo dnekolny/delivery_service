@@ -1,18 +1,18 @@
-package com.example.delivery_service.model;
+package com.example.delivery_service.model.Entity;
+
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Set;
 
 
 @Entity
-//@Table(name="user")
 public class User {
 
     @Id
-    //@Column(name="id")
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
@@ -20,28 +20,23 @@ public class User {
 
     private Date updateDate;
 
-    //@Column(name="name")
-    @NotNull
+    @NotBlank
     private String name;
 
-    //@Column(name="surname")
-    @NotNull
+    @NotBlank
     private String surname;
 
-    //@Column(name="password")
     @Size(min = 8)
-    @NotNull
+    @NotBlank
     private String password;
 
-    //@Column(name="email")
-    @NotNull
+    @Email
+    @NotBlank
     private String email;
 
-    //@Column(name = "phone_number")
     private String phoneNumber;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    //@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Role> roles;
 
     public User() { }
@@ -54,6 +49,8 @@ public class User {
         this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.roles = user.getRoles();
+        this.createDate = user.getCreateDate();
+        this.updateDate = user.getUpdateDate();
     }
 
     public Long getId() {
