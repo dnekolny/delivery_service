@@ -9,8 +9,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class OrderController {
     
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/newOrder", method = RequestMethod.GET)
+    @RequestMapping(value = "/order/new", method = RequestMethod.GET)
     public String newOrder() {
         return "newOrder";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/orders", method = RequestMethod.GET)
+    public String orders() {
+        return "orders";
     }
 }

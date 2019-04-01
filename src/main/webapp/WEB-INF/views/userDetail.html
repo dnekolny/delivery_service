@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/header :: head('Delivery service - User')">
+    <meta charset="UTF-8">
+    <title>users</title>
+</head>
+<body>
+
+
+<div th:replace="fragments/header :: header('user')"></div>
+
+
+<main role="main" class="col-md-8 ml-sm-auto col-lg-10 px-4 mt-2">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2" th:text="${user.fullname}">Name</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-primary">
+                    <span data-feather="edit"></span>
+                    Edit
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger">
+                    <span data-feather="trash-2"></span>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 col-lg-4">
+            <p class="text-muted mb-1" th:text="#{email.name} + ':'"></p>
+            <p class="ml-2 font-weight-bold" th:text="${user.email}"></p>
+        </div>
+        <div class="col-6 col-lg-8">
+            <p class="text-muted mb-1" th:text="#{phone.number.name} + ':'"></p>
+            <p class="ml-2 font-weight-bold" th:text="${user.phoneNumber}"></p>
+        </div>
+    </div>
+
+    <p class="text-muted mb-1" th:text="#{address.name} + ':'"></p>
+    <a th:if="${user.address == null}" class="btn btn-sm btn-primary ml-2" th:href="@{/user/edit/} + ${user.id}" th:text="#{btn.add.address}">Add address</a>
+    <div th:if="${user.address != null}">
+        <p><span th:text="#{address.city.name}"><strong th:text="${user.address.city}"></strong></span></p>
+        <p><span th:text="#{address.street.name}"><strong th:text="${user.address.street}"></strong></span></p>
+        <p><span th:text="#{address.zip.name}"><strong th:text="${user.address.zip}"></strong></span></p>
+    </div>
+
+</main>
+
+<script>
+    feather.replace();
+</script>
+
+</body>
+</html>

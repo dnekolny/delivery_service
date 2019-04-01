@@ -36,8 +36,8 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public List<User> getBySurname(String surname) {
-        return repository.getBySurname(surname);
+    public List<User> getByFullname(String surname) {
+        return repository.getByFullname(surname);
     }
 
     public Optional<User> getUserByEmail(String email) {

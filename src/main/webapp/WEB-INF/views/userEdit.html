@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/header :: head('Delivery service - User')">
+    <meta charset="UTF-8">
+    <title>users</title>
+</head>
+<body>
+
+
+<div th:replace="fragments/header :: header('user')"></div>
+
+
+<main role="main" class="col-md-8 ml-sm-auto col-lg-10 px-4 mt-2">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Edit user</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <span data-feather="calendar"></span>
+                This week
+            </button>
+        </div>
+    </div>
+
+    <form class="needs-validation" method="post" th:action="@{/user/add}" th:object="${user}" th:fragment="signupForm" novalidate>
+
+        <div class="card">
+            <div class="card-header" th:text="#{basic.information.name}">
+                Basic information
+            </div>
+            <div class="card-body">
+
+                <!--FULL NAME-->
+                <div class="form-group">
+                    <label for="name" th:text="#{fullname.name}">Full name</label>
+                    <input id="name" type="text" class="form-control" th:field="*{fullname}"
+                           th:classappend="${#fields.hasErrors('fullname')} ? 'is-invalid'" required /> <!--th:classappend="${#fields.hasErrors('name')} ? is-invalid : is-valid"-->
+                    <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{fullname.name})}">jméno je povinné</span>
+                </div>
+                <!--EMAIL-->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="email" th:text="#{email.name}">Email</label>
+                        <input id="email" type="text" class="form-control" th:field="*{email}"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" required />
+                        <span class="text-danger invalid-feedback" th:text="#{email.message}">zadejte validní email</span>
+                    </div>
+                    <!--EMAIL-->
+                    <div class="form-group col-md-6">
+                        <label for="phoneNumber" th:text="#{phone.number.name}">Telephone number</label>
+                        <input id="phoneNumber" type="text" class="form-control" th:field="*{phoneNumber}" />
+                    </div>
+                </div>
+                <br>
+
+                <!--NEW PASSWORD-->
+                <div class="form-group">
+                    <label for="password" th:text="#{password.new.name}">Password</label>
+                    <input id="password" type="password" class="psw form-control" th:field="*{password}"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required minlength="8"/>
+                    <span class="text-danger invalid-feedback" th:text="#{size.bigger.then.message('8')}">heslo musí mít minimálně 8 znaků</span>
+                </div>
+                <div class="form-group">
+                    <label for="password2" th:text="#{password2.name}">Password again</label>
+                    <input id="password2" type="password" class="psw form-control" />
+                    <span class="text-danger invalid-feedback" th:text="#{password.notEqual.message}">hesla se neshodují</span>
+                </div>
+            </div>
+        </div>
+        <div class="card mt-2" id="addressCard">
+            <div class="card-header" th:text="#{address.name}">
+                Address
+            </div>
+            <div class="card-body">
+                <!--STREET-->
+                <div class="form-group">
+                    <label for="street" th:text="#{address.street.name}">Street</label>
+                    <input id="street" type="text" class="form-control" th:field="*{address.street}" />
+                </div>
+                <!--CITY-->
+                <div class="form-group">
+                    <label for="city" th:text="#{address.city.name}">City</label>
+                    <input id="city" type="text" class="form-control" th:field="*{address.city}"/>
+                </div>
+                <div class="form-row">
+                    <!--STATE-->
+                    <div class="form-group col-md-6">
+                        <label for="state" th:text="#{address.state.name}">State</label>
+                        <input id="state" type="text" class="form-control" <!--th:field="*{address.state}"/> -->
+                    </div>
+                    <!--ZIP TODO-->
+                    <div class="form-group col-md-6">
+                        <label for="zip" th:text="#{address.zip.name}">Zip</label>
+                        <select id="zip" class="form-control"> <!--th:field="*{address.zip}"-->
+                            <option selected>Choose...</option>
+                            <option>...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button id="signupButton" type="submit" class="btn btn-warning" th:text="#{btn.save}">Uložit</button>
+    </form>
+
+</main>
+
+</body>
+</html>

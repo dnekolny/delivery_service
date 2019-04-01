@@ -21,4 +21,14 @@ public class HomeController {
         model.addAttribute(new User());
         return "login";
     }
+
+    @RequestMapping(value = "/403", method = RequestMethod.GET)
+    public String error403(){
+        return "errors/403";
+    }
+
+    @RequestMapping(value = "/404", method = RequestMethod.GET)
+    public String error404(){
+        return "errors/404";
+    }
 }

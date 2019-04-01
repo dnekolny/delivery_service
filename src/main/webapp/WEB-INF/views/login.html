@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap Login &amp; Register Templates</title>
+    <title id="pageTitle">Delivery service - Login</title>
 
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{http://fonts.googleapis.com/css(family='Roboto:400,100,300,500')}">
@@ -59,8 +59,9 @@
             </div>
 
             <div class="row">
-                 <div class="col-md-5">
 
+                <!--LOGIN-->
+                 <div class="col-md-5">
                     <div class="form-box">
                         <div class="form-top">
                             <div class="form-top-left">
@@ -97,14 +98,13 @@
 
                         </div>
                     </div>
-
                 </div>
 
                 <div class="col-md-1 middle-border"></div>
                 <div class="col-md-1"></div>
 
+                <!--REGISTRATION-->
                 <div class="col-md-5">
-
                     <div class="form-box">
                         <div class="form-top">
                             <div class="form-top-left">
@@ -116,48 +116,57 @@
                             </div>
                         </div>
                         <div class="form-bottom">
+
+                            <div th:if="${regErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <span th:text="${regErrorMessage}" />
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
                             <form class="needs-validation" method="post" th:action="@{/user/add}" th:object="${user}" th:fragment="signupForm" novalidate>
+                                <input type="text" name="autoLogin" hidden value="true">
                                 <div class="form-group">
-                                    <label for="name" class="sr-only">First name</label>
-                                    <input id="name" type="text" placeholder="Jméno..." class="form-control" th:field="*{name}"
-                                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" required /> <!--th:classappend="${#fields.hasErrors('name')} ? is-invalid : is-valid"-->
-                                    <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{name.name})}">jméno je povinné</span>
+                                    <label for="name" class="sr-only" th:text="#{name.fullname}">First name</label>
+                                    <input id="name" type="text" th:placeholder="#{name.fullname}+'...'" class="form-control" th:field="*{fullname}"
+                                           th:classappend="${#fields.hasErrors('fullname')} ? 'is-invalid'" required /> <!--th:classappend="${#fields.hasErrors('name')} ? is-invalid : is-valid"-->
+                                    <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{fullname.name})}">jméno je povinné</span>
                                     <!--<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
                                 </div>
-                                <div class="form-group">
-                                    <label for="surname" class="sr-only">Last name</label>
-                                    <input id="surname" type="text" placeholder="Příjmení..." class="form-control" th:field="*{surname}"
+                                <!--<div class="form-group">
+                                    <label for="surname" class="sr-only" th:text="#{surname.name}">Last name</label>
+                                    <input id="surname" type="text" th:placeholder="#{surname.name}+'...'" class="form-control" th:field="*{surname}"
                                            th:classappend="${#fields.hasErrors('surname')} ? 'is-invalid'" required />
                                     <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{surname.name})}">příjmení je povinné</span>
-                                </div>
+                                </div>-->
                                 <div class="form-group">
-                                    <label for="email" class="sr-only">Email</label>
-                                    <input id="email" type="text" placeholder="Email..." class="form-control" th:field="*{email}"
+                                    <label for="email" class="sr-only" th:text="#{email.name}">Email</label>
+                                    <input id="email" type="text" th:placeholder="#{email.name}+'...'" class="form-control" th:field="*{email}"
                                            th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" required />
                                     <span class="text-danger invalid-feedback" th:text="#{email.message}">zadejte validní email</span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="phoneNumber" class="sr-only">Telephone number</label>
-                                    <input id="phoneNumber" type="text" placeholder="Telefonní číslo..." class="form-control" th:field="*{phoneNumber}" />
+                                    <label for="phoneNumber" class="sr-only" th:text="#{phone.number.name}">Telephone number</label>
+                                    <input id="phoneNumber" type="text" th:placeholder="#{phone.number.name}+'...'" class="form-control" th:field="*{phoneNumber}" />
                                 </div>
                                 <br>
                                 <div class="form-group">
-                                    <label for="password" class="sr-only">Password</label>
-                                    <input id="password" type="password" placeholder="Heslo..." class="psw form-control" th:field="*{password}"
+                                    <label for="password" class="sr-only" th:text="#{password.name}">Password</label>
+                                    <input id="password" type="password" th:placeholder="#{password.name}+'...'" class="psw form-control" th:field="*{password}"
                                            th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required minlength="8"/>
                                     <span class="text-danger invalid-feedback" th:text="#{size.bigger.then.message('8')}">heslo musí mít minimálně 8 znaků</span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password2" class="sr-only">Password again</label>
-                                    <input id="password2" type="password" placeholder="Heslo znovu..." class="psw form-control" />
+                                    <label for="password2" class="sr-only" th:text="#{password2.name}">Password again</label>
+                                    <input id="password2" type="password" th:placeholder="#{password2.name}+'...'" class="psw form-control" />
                                     <span class="text-danger invalid-feedback" th:text="#{password.notEqual.message}">hesla se neshodují</span>
                                 </div>
-                                <button id="signupButton" type="submit" class="btn btn-warning">Zaregistrovat se</button>
+                                <button id="signupButton" type="submit" class="btn btn-warning" th:text="#{btn.register}">Zaregistrovat se</button>
                             </form>
                         </div>
                     </div>
-
                 </div>
+
             </div>
 
         </div>

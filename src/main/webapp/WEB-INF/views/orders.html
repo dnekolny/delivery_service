@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org"  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head th:insert="fragments/header :: head('Delivery service - Orders')">
+    <meta charset="UTF-8">
+    <title>orders</title>
+</head>
+<body>
+
+
+<div th:replace="fragments/header :: header('order')"></div>
+
+
+<main role="main" class="col-md-8 ml-sm-auto col-lg-10 px-4 mt-2">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Orders</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <span data-feather="calendar"></span>
+                This week
+            </button>
+        </div>
+    </div>
+
+    <!--CONTENT-->
+
+    <div sec:authorize="hasRole('ROLE_ADMIN')">IS ADMIN1</div>
+
+    <div sec:authorize="hasRole('ROLE_CUSTOMER')">IS CUSTOMER1</div>
+
+    <div sec:authorize="hasRole('ADMIN')">IS ADMIN2</div>
+
+    <div sec:authorize="hasRole('CUSTOMER')">IS CUSTOMER2</div>
+
+    <div sec:authorize="hasAuthority('ROLE_ADMIN')">IS ADMIN3</div>
+
+    <div sec:authorize="hasAuthority('ROLE_CUSTOMER')">IS CUSTOMER3</div>
+
+    <div sec:authorize="hasAuthority('ADMIN')">IS ADMIN4</div>
+
+    <div sec:authorize="hasAuthority('CUSTOMER')">IS CUSTOMER4</div>
+
+    <div sec:authorize="isAuthenticated()">IS AUTHENTICATED</div>
+
+    <div sec:authorize="isAnonymous()">IS ANONYMOUS</div>
+
+</main>
+
+</body>
+</html>
