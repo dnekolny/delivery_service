@@ -17,7 +17,7 @@ public class Address {
     private Date updateDate;
 
     @NotNull
-    @OneToMany(targetEntity = State.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = State.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private State state;
 
     @NotBlank
@@ -38,6 +38,23 @@ public class Address {
         this.street = street;
         this.city = city;
         this.zip = zip;
+    }
+
+    public boolean isEmpty(){
+        return isEmpty(false);
+    }
+
+    //includShortcut = false -> adresa se považuje za prázdnou i když obsahuje shortcut
+    //                 true -> adresa je prázdná pouze když jsou všechny parametry null nebo prázdné
+    public boolean isEmpty(boolean includShortcut){
+        if (includShortcut)
+            return (state == null && street.isEmpty() && city.isEmpty() && zip.isEmpty());
+        else
+            return ((state == null || (state.getId() == null && (state.getName() == null || state.getName().isEmpty()))) && street.isEmpty() && city.isEmpty() && zip.isEmpty());
+    }
+
+    public boolean isValid(){
+        return (state != null && !state.getShortcut().isEmpty() && !street.isEmpty() && !city.isEmpty() && !zip.isEmpty());
     }
 
     public Long getId() {

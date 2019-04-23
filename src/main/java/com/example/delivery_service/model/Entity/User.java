@@ -1,6 +1,8 @@
 package com.example.delivery_service.model.Entity;
 
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -42,6 +44,14 @@ public class User extends Partner {
         super(user);
         this.password = user.getPassword();
         this.roles = user.getRoles();
+    }
+
+    public static User getCurrentUser(){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(user != null) {
+            user.setPassword("");
+        }
+        return user;
     }
 
     public String getPassword() {

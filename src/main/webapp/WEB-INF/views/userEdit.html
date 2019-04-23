@@ -1,37 +1,66 @@
 <!DOCTYPE html>
 <html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
-<head th:insert="fragments/header :: head('Delivery service - User')">
+<head th:insert="fragments/layout :: head('Delivery service - User')">
     <meta charset="UTF-8">
     <title>users</title>
 </head>
 <body>
 
+<div th:if="${isProfile}">
+    <div th:replace="fragments/layout :: header('profile')"></div>
+</div>
+<div th:if="${!isProfile}">
+    <div th:replace="fragments/layout :: header('user')"></div>
+</div>
 
-<div th:replace="fragments/header :: header('user')"></div>
 
-
-<main role="main" class="col-md-8 ml-sm-auto col-lg-10 px-4 mt-2">
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Edit user</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group mr-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                <div th:if="${isProfile}">
+                    <button type="button" class="btn btn-sm btn-primary" th:onclick="'location.href=\'' + @{/profile} + '\';'">
+                        <span data-feather="arrow-left"></span>
+                        Profile
+                    </button>
+                </div>
+                <div th:if="${!isProfile}">
+                    <button type="button" class="btn btn-sm btn-primary" th:onclick="'location.href=\'' + @{/user/detail/} + ${user.id} + '?prof=false\';'">
+                        <span data-feather="arrow-left"></span>
+                        Detail
+                    </button>
+                </div>
+
+                <button type="button" id="buttonDelete" class="btn btn-sm btn-outline-danger"
+                        th:attr="data-message=#{confirm.delete.user(${user.id})},
+                                 data-href=@{/user/delete/} + ${user.id}">
+                    <span data-feather="trash-2"></span>
+                    Delete
+                </button>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <span data-feather="calendar"></span>
-                This week
-            </button>
         </div>
     </div>
 
-    <form class="needs-validation" method="post" th:action="@{/user/add}" th:object="${user}" th:fragment="signupForm" novalidate>
+    <div th:if="${errorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}" />
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <form class="needs-validation" method="post" th:action="@{/user/update}" th:object="${user}" th:fragment="signupForm" novalidate>
 
         <div class="card">
             <div class="card-header" th:text="#{basic.information.name}">
                 Basic information
             </div>
             <div class="card-body">
+
+                <!--HIDDEN-->
+                <input hidden th:field="*{id}" >
+                <input hidden th:if="*{address != null}" th:field="*{address.id}">
+                <input hidden name="isProfile" th:value="${isProfile}" />
 
                 <!--FULL NAME-->
                 <div class="form-group">
@@ -40,6 +69,14 @@
                            th:classappend="${#fields.hasErrors('fullname')} ? 'is-invalid'" required /> <!--th:classappend="${#fields.hasErrors('name')} ? is-invalid : is-valid"-->
                     <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{fullname.name})}">jméno je povinné</span>
                 </div>
+
+                <div th:if="${emailErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${emailErrorMessage}" />
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
                 <!--EMAIL-->
                 <div class="form-row">
                     <div class="form-group col-md-6">
@@ -59,8 +96,8 @@
                 <!--NEW PASSWORD-->
                 <div class="form-group">
                     <label for="password" th:text="#{password.new.name}">Password</label>
-                    <input id="password" type="password" class="psw form-control" th:field="*{password}"
-                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required minlength="8"/>
+                    <input id="password" type="password" class="psw form-control" name="newPassword"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" minlength="8"/>
                     <span class="text-danger invalid-feedback" th:text="#{size.bigger.then.message('8')}">heslo musí mít minimálně 8 znaků</span>
                 </div>
                 <div class="form-group">
@@ -70,11 +107,18 @@
                 </div>
             </div>
         </div>
-        <div class="card mt-2" id="addressCard">
+        <div class="card mt-2 mb-3" id="address">
             <div class="card-header" th:text="#{address.name}">
                 Address
             </div>
             <div class="card-body">
+                <div th:if="${addressErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${addressErrorMessage}" />
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
                 <!--STREET-->
                 <div class="form-group">
                     <label for="street" th:text="#{address.street.name}">Street</label>
@@ -89,24 +133,61 @@
                     <!--STATE-->
                     <div class="form-group col-md-6">
                         <label for="state" th:text="#{address.state.name}">State</label>
-                        <input id="state" type="text" class="form-control" <!--th:field="*{address.state}"/> -->
+                        <select class="form-control" id="state" th:field="*{address.state.shortcut}">
+                            <option th:each="state : ${states}" th:value="${state.shortcut}" th:text="${state.name}">state</option>
+                        </select>
                     </div>
-                    <!--ZIP TODO-->
+                    <!--ZIP-->
                     <div class="form-group col-md-6">
                         <label for="zip" th:text="#{address.zip.name}">Zip</label>
-                        <select id="zip" class="form-control"> <!--th:field="*{address.zip}"-->
-                            <option selected>Choose...</option>
-                            <option>...</option>
-                        </select>
+                        <input id="zip" type="text" class="form-control" th:field="*{address.zip}"/>
                     </div>
                 </div>
             </div>
         </div>
 
-        <button id="signupButton" type="submit" class="btn btn-warning" th:text="#{btn.save}">Uložit</button>
+        <div class="card mt-2 mb-3" id="adr">
+            <div class="card-header" th:text="#{password.confirm.name}">
+                Potvrdit heslo
+            </div>
+            <div class="card-body">
+
+                <div th:if="${passwordErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${passwordErrorMessage}" />
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!--PASSWORD-->
+                <div class="form-group">
+                    <label for="origPassword" th:text="#{password.old.name}">Password</label>
+                    <input id="origPassword" type="text" th:field="*{password}" class="form-control"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required minlength="8"/>
+                    <span class="text-danger invalid-feedback" th:text="#{size.bigger.then.message('8')}">heslo musí mít minimálně 8 znaků</span>
+                </div>
+
+            </div>
+        </div>
+
+        <button id="submitButton" type="submit" class="btn btn-warning" th:text="#{btn.save}">Uložit</button>
     </form>
 
 </main>
+
+<div th:replace="fragments/layout :: footer"></div>
+
+<script>
+    $('#buttonDelete').on('click', function () {
+        var result = confirm($(this).data("message"));
+        if (result) {
+            window.location = $(this).data("href");
+        }
+    })
+    
+    $('#submitButton').on('click', function () { comparePasswords($('#password'), $('#password2'), false) });
+    $('#password').on('input', function () { checkPassword($('#password'), $('#password2'), false) });
+    $('#password2').on('input', function () { comparePasswords($('#password'), $('#password2'), false) });
+</script>
 
 </body>
 </html>

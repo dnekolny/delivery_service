@@ -116,17 +116,52 @@
                 </div>
             </nav>
 
-
         </div>
     </div>
 
     <script th:src="@{/webjars/jquery/3.3.1/jquery.min.js}"></script>
     <script th:src="@{/webjars/bootstrap/4.3.0/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/feather.min.js}"></script>
+    <script src="/js/form.validation.js"></script>
+
     <script>
-        feather.replace();
+        jQuery(document).ready(function() {
+            feather.replace();
+        })
     </script>
 </header>
+
+<footer class="bg-dark text-white mt-4" style="z-index: 2000!important;" th:fragment="footer">
+    <div>
+        CoreUI
+        <span>&copy; 2018 creativeLabs.</span>
+    </div>
+    <div class="ml-auto">
+        <span>Powered by</span>
+        <a href="https://coreui.io">CoreUI</a>
+    </div>
+
+    <script>
+        jQuery(document).ready(function() {
+
+            window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = $('.needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+
+        });
+    </script>
+</footer>
 
 
 </body>

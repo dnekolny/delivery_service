@@ -3,24 +3,18 @@ package com.example.delivery_service.controllers;
 import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.model.UserDetailsImpl;
 import com.example.delivery_service.services.RoleService;
+import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,17 +26,20 @@ public class UserController {
 
     private final UserService userService;
     private final RoleService roleService;
+    private final StateService stateService;
     private final PasswordEncoder passwordEncoder;
     private final MessageSource messageSource;
 
     @Autowired
-    public UserController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder, MessageSource messageSource) {
+    public UserController(UserService userService, RoleService roleService, StateService stateService, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.userService = userService;
         this.roleService = roleService;
+        this.stateService = stateService;
         this.passwordEncoder = passwordEncoder;
         this.messageSource = messageSource;
     }
 
+    /**LIST*/
     @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public String secureListUsers(Model model) {
@@ -50,6 +47,7 @@ public class UserController {
         return "users";
     }
 
+    /**ADD*/
     @RequestMapping(value= "/user/add", method = RequestMethod.POST)
     public String addUser(HttpServletRequest request, @Valid @ModelAttribute("user") User user,
                           BindingResult bindingResult,
@@ -61,7 +59,6 @@ public class UserController {
         }
 
         try {
-
             //kotroluje jestli už uživatel neexistuje
             Optional<User> exUser = userService.getUserByEmail(user.getEmail());
             if(exUser.isPresent()){
@@ -70,14 +67,9 @@ public class UserController {
                 return "redirect:/login";
             }
 
-            user.setRoles(new HashSet<>(Collections.singletonList(roleService.getRoleByName("CUSTOMER").orElse(null))));
-
             String pwd = user.getPassword();
-
             user.setPassword(passwordEncoder.encode(pwd));
 
-            user.setCreateDate(new Date());
-            user.setUpdateDate(user.getCreateDate());
             this.userService.saveOrUpdate(user);
 
             if(autoLogin) {
@@ -90,78 +82,124 @@ public class UserController {
         catch (Exception ex){
             String message = messageSource.getMessage("error.unexpected.while.registration", null, LocaleContextHolder.getLocale());
             redir.addFlashAttribute("regErrorMessage", message);
-            return "redirect:/login"; //TODO přidat error messsage
+            return "redirect:/login";
         }
     }
 
+    /**DETAIL*/
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/user/detail/{id}", method = RequestMethod.GET)
+    public String detailUser(@PathVariable("id") Long id,
+                             @RequestParam("prof") boolean isProfile,
+                             HttpServletRequest request,
+                             Model model){
+
+        //kontrola práv
+        if(request.isUserInRole("ADMIN") || User.getCurrentUser().getId().equals(id)){
+            model.addAttribute("isProfile", isProfile);
+            User user = userService.getUserById(id).orElse(null);
+            model.addAttribute("user", user);
+            return "userDetail";
+        }
+        model.addAttribute("isProfile", false);
+
+        return "errors/403";
+    }
+
+    /**PROFILE*/
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/profile", method = RequestMethod.GET)
+    public String currentUser(Model model){
+
+        User user = userService.getUserById(User.getCurrentUser().getId()).orElse(null);
+        model.addAttribute("user", user);
+        model.addAttribute("isProfile", true);
+
+        return "userDetail";
+    }
+
+    /**EDIT*/
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/user/edit/{id}", method = RequestMethod.GET)
+    public String editUser(@PathVariable("id") Long id, @RequestParam("prof") boolean isProfile, HttpServletRequest request, Model model){
+
+        model.addAttribute("states", stateService.getAllStates());
+
+        //kontrola práv
+        if(request.isUserInRole("ADMIN") || User.getCurrentUser().getId().equals(id)){
+            model.addAttribute("isProfile", isProfile);
+            User user = userService.getUserById(id).orElse(null);
+            model.addAttribute("user", user);
+            return "userEdit";
+        }
+
+        return "errors/403";
+    }
+
+    /**UPDATE*/
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
+    public String updateUser(@Valid @ModelAttribute("user") User user,
+                             @ModelAttribute("newPassword") String newPassword,
+                             @ModelAttribute("isProfile") boolean isProfile,
+                             HttpServletRequest request,
+                             Model model){
+
+        //kontrola práv
+        if(request.isUserInRole("ADMIN") || User.getCurrentUser().getId().equals(user.getId()))
+        {
+            //kotroluje zda neexistuje uživatel se stejným mailem
+            Optional<User> exUser = userService.getUserByEmail(user.getEmail());
+            if(exUser.isPresent() && !exUser.get().getId().equals(user.getId())){
+                model.addAttribute("user", user);
+                String message = messageSource.getMessage("error.user.exist", null, LocaleContextHolder.getLocale());
+                model.addAttribute("emailErrorMessage", message);
+                return "userEdit";
+            }
+            else {
+                Optional<User> origOptUser = userService.getUserById(user.getId(), true);
+
+                if (origOptUser.isPresent()) {
+                    User origUser = origOptUser.get();
+
+                    if (passwordEncoder.matches(user.getPassword(), origUser.getPassword())) {
+
+                        if (newPassword.isEmpty()) {
+                            user.setPassword(origUser.getPassword());
+                        } else {
+                            user.setPassword(passwordEncoder.encode(newPassword));
+                        }
+
+                        userService.saveOrUpdate(user);
+
+                        if (isProfile)
+                            return "redirect:/profile";
+                        else
+                            return "user/detail" + user.getId();
+                    } else {
+                        model.addAttribute("user", user);
+                        String message = messageSource.getMessage("error.bad.original.password", null, LocaleContextHolder.getLocale());
+                        model.addAttribute("passwordErrorMessage", message);
+                        return "userEdit";
+                    }
+                } else {
+                    model.addAttribute("user", user);
+                    String message = messageSource.getMessage("error.something.is.wrong", null, LocaleContextHolder.getLocale());
+                    model.addAttribute("errorMessage", message);
+                    return "userEdit";
+                }
+            }
+        }
+        else {
+            return "errors/403";
+        }
+    }
+
+    /**DELETE*/
     @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(value = "/user/delete/{id}", method = RequestMethod.GET)
     public String removeUser(@PathVariable("id") Long id){
         this.userService.removeUser(id);
         return "redirect:/users";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/user/edit/{id}", method = RequestMethod.GET)
-    public String editUser(@PathVariable("id") Long id, HttpServletRequest request, Model model){
-
-        //kontrola práv
-        if(request.isUserInRole("ADMIN")){
-            User user = userService.getUserById(id).orElse(null);
-            model.addAttribute("user", user);
-            return "userEdit";
-        }
-        else{
-             User currUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(currUser.getId().equals(id)){
-                model.addAttribute("user", currUser);
-                return "userEdit";
-            }
-        }
-
-        return "errors/403";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/user/detail/{id}", method = RequestMethod.GET)
-    public String detailUser(@PathVariable("id") Long id, HttpServletRequest request, Model model){
-
-        //kontrola práv
-        if(request.isUserInRole("ADMIN")){
-            User user = userService.getUserById(id).orElse(null);
-            model.addAttribute("user", user);
-            return "userDetail";
-        }
-        else{
-            User currUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(currUser.getId().equals(id)){
-                model.addAttribute("user", currUser);
-                return "userDetail";
-            }
-        }
-
-        return "errors/403";
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
-    public String updateUser(@Valid @ModelAttribute("user") User p, HttpServletRequest request){
-
-        //kontrola práv
-        if(request.isUserInRole("ADMIN") || ((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId().equals(p.getId())){
-            userService.saveOrUpdate(p);
-        }
-
-        return "redirect:/user/detail/" + p.getId();
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @RequestMapping(value = "/profile", method = RequestMethod.GET)
-    public String currentUser(Model model){
-
-        User user = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        model.addAttribute("user", user);
-
-        return "userDetail";
     }
 }

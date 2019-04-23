@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
-<head th:insert="fragments/header :: head('Delivery service - Users')">
+<head th:insert="fragments/layout :: head('Delivery service - Users')">
     <meta charset="UTF-8">
     <title>users</title>
 </head>
 <body>
 
 
-        <div th:replace="fragments/header :: header('user')"></div>
+        <div th:replace="fragments/layout :: header('user')"></div>
 
 
-        <main role="main" class="col-md-8 ml-sm-auto col-lg-10 px-4 mt-2">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Users</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
@@ -36,13 +36,13 @@
                         <th scope="col">Actions</th>
                     </tr>
                     <tr th:each="user : ${users}">
-                        <td th:text="${user.id}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id}"></td>
-                        <td th:text="${user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id}"></td>
-                        <td th:text="${user.email}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id}"></td>
-                        <td th:text="${user.phoneNumber}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id}"></td>
-                        <td th:text="${user.createDate}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id}"></td>
+                        <td th:text="${user.id}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                        <td th:text="${user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                        <td th:text="${user.email}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                        <td th:text="${user.phoneNumber}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                        <td th:text="${user.createDate}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
                         <td>
-                            <a th:href="@{/user/edit/} + ${user.id}" class="text-primary">
+                            <a th:href="@{/user/edit/} + ${user.id} + '?prof=false'" class="text-primary">
                                 <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
                             <a th:href="@{/user/delete/} + ${user.id}" class="ml-1 text-danger" th:onclick="'return confirm(\'' + #{confirm.delete.user(${user.id})} + '\')'">
                                 <span style="width: 20px; height: 20px" data-feather="trash-2"></span></a>

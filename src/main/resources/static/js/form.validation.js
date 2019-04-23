@@ -1,23 +1,41 @@
 
-function checkPassword(pass, repass){
+function checkPassword(pass, repass, required){
 
-    if(pass.val().length < 8){
-        pass[0].setCustomValidity('invalid');
+    if(required){
+        if(pass.val().length < 8){
+            pass[0].setCustomValidity('invalid');
+        }
+        else {
+            pass[0].setCustomValidity('');
+        }
     }
     else {
-        pass[0].setCustomValidity('');
+        if(pass.val().length > 0 && pass.val().length < 8){
+            pass[0].setCustomValidity('invalid');
+        }
+        else {
+            pass[0].setCustomValidity('');
+        }
     }
 
     comparePasswords(pass, repass);
 }
 
-function comparePasswords(pass, repass){
+function comparePasswords(pass, repass, required){
 
-    if(repass.val().length < 8 || pass.val() !== repass.val()){
-        repass[0].setCustomValidity('invalid');
+    if(required) {
+        if (repass.val().length < 8 || pass.val() !== repass.val()) {
+            repass[0].setCustomValidity('invalid');
+        } else {
+            repass[0].setCustomValidity('');
+        }
     }
     else {
-        repass[0].setCustomValidity('');
+        if ((pass.val().length > 0 && repass.val().length < 8) || pass.val() !== repass.val()) {
+            repass[0].setCustomValidity('invalid');
+        } else {
+            repass[0].setCustomValidity('');
+        }
     }
 }
 

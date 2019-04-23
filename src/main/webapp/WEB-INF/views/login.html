@@ -127,8 +127,8 @@
                             <form class="needs-validation" method="post" th:action="@{/user/add}" th:object="${user}" th:fragment="signupForm" novalidate>
                                 <input type="text" name="autoLogin" hidden value="true">
                                 <div class="form-group">
-                                    <label for="name" class="sr-only" th:text="#{name.fullname}">First name</label>
-                                    <input id="name" type="text" th:placeholder="#{name.fullname}+'...'" class="form-control" th:field="*{fullname}"
+                                    <label for="name" class="sr-only" th:text="#{fullname.name}">First name</label>
+                                    <input id="name" type="text" th:placeholder="#{fullname.name}+'...'" class="form-control" th:field="*{fullname}"
                                            th:classappend="${#fields.hasErrors('fullname')} ? 'is-invalid'" required /> <!--th:classappend="${#fields.hasErrors('name')} ? is-invalid : is-valid"-->
                                     <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{fullname.name})}">jméno je povinné</span>
                                     <!--<span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
@@ -209,9 +209,9 @@
         /**REGISTRATION VALIDATION*/
         $('#signupButton').on('click', function () { validateEmail($('#email')) });
         $('#email').on('input', function () { validateEmail($('#email')) });
-        $('#signupButton').on('click', function () { comparePasswords($('#password'), $('#password2')) });
-        $('#password').on('input', function () { checkPassword($('#password'), $('#password2')) });
-        $('#password2').on('input', function () { comparePasswords($('#password'), $('#password2')) });
+        $('#signupButton').on('click', function () { comparePasswords($('#password'), $('#password2'), true) });
+        $('#password').on('input', function () { checkPassword($('#password'), $('#password2'), true) });
+        $('#password2').on('input', function () { comparePasswords($('#password'), $('#password2'), true) });
 
 
 
