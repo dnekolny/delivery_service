@@ -1,6 +1,9 @@
 package com.example.delivery_service.model.Entity;
 
+import com.example.delivery_service.services.StateService;
+
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -21,11 +24,13 @@ public class Partner {
     private String fullname;
 
     @Email
+    @NotBlank
     private String email;
 
     private String phoneNumber;
 
     @OneToOne(targetEntity = Address.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Valid
     private Address address;
 
     public Partner() {
@@ -39,6 +44,49 @@ public class Partner {
         this.email = partner.getEmail();
         this.phoneNumber = partner.getPhoneNumber();
         this.address = partner.getAddress();
+    }
+
+    public void setCreateAndUpdateDates(Partner partner){
+        if(partner != null) {
+            setCreateDate(partner.getCreateDate());
+            if(getAddress() != null)
+                getAddress().setCreateAndUpdateDates(partner.getAddress());
+        }
+        else{
+            setCreateDate(new Date());
+            if(getAddress() != null)
+                getAddress().setCreateAndUpdateDates(null);
+        }
+
+        setUpdateDate(new Date());
+    }
+
+    public void setUpdateDates(){
+        setUpdateDate(new Date());
+        if(address != null){
+            address.setUpdateDate(new Date());
+        }
+    }
+
+    public void unite(Partner newPartner, StateService stateService){
+        fullname = newPartner.fullname;
+        email = newPartner.email;
+        phoneNumber = newPartner.phoneNumber;
+
+        if(address == null)
+            address = new Address();
+        if(newPartner.address == null)
+            address = null;
+        else {
+            address.setStreet(newPartner.address.getStreet());
+            address.setCity(newPartner.address.getCity());
+            address.setZip(newPartner.address.getZip());
+            if(newPartner.address.getState() != null){
+                address.setState(newPartner.address.getState());
+                address.fillStateFromShortcut(stateService);
+            }
+
+        }
     }
 
     public Long getId() {

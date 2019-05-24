@@ -25,6 +25,20 @@ public class UserService {
 
     public void saveOrUpdate(User user) {
 
+        //ADDRESS
+        if(user.getAddress() != null) {
+            if (user.getAddress().isEmpty())
+                //zabrání uložení prázdné adresy
+                user.setAddress(null);
+            else {
+                //nastaví State podle shortcut
+                user.getAddress().fillStateFromShortcut(stateService);
+                /*user.getAddress().setUpdateDate(new Date());
+                if(user.getAddress().getId() == null)
+                    user.getAddress().setCreateDate(new Date());*/
+            }
+        }
+
         Optional<User> origOptUser = Optional.empty();
 
         if(user.getId() != null) {
@@ -35,7 +49,8 @@ public class UserService {
         if (origOptUser.isPresent()) {
             User origUser = origOptUser.get();
 
-            user.setCreateDate(origUser.getCreateDate());
+            user.setCreateAndUpdateDates(origUser);
+            user.setOrders(origUser.getOrders());
 
             //ROLES
             if (user.getRoles() == null || user.getRoles().size() == 0)
@@ -43,25 +58,9 @@ public class UserService {
         }
         /**NEW*/
         else{
-            user.setCreateDate(new Date());
-            user.setRoles(new HashSet<>(Collections.singletonList(roleService.getRoleByName("CUSTOMER").orElse(null))));
+            user.setCreateAndUpdateDates(null);
+            user.setRoles(new HashSet<>(Collections.singletonList(roleService.getDefaultRole().orElse(null))));
         }
-
-        //ADDRESS
-        if(user.getAddress() != null) {
-            if (user.getAddress().isEmpty())
-                //zabrání uložení prázdné adresy
-                user.setAddress(null);
-            else {
-                //nastaví State podle shortcut
-                user.getAddress().setState(stateService.getStateByShortcut(user.getAddress().getState().getShortcut()).orElse(null));
-                user.getAddress().setUpdateDate(new Date());
-                if(user.getAddress().getId() == null)
-                    user.getAddress().setCreateDate(new Date());
-            }
-        }
-
-        user.setUpdateDate(new Date());
 
         repository.save(user);
     }

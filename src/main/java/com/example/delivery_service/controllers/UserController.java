@@ -1,7 +1,7 @@
 package com.example.delivery_service.controllers;
 
+import com.example.delivery_service.model.Entity.Role;
 import com.example.delivery_service.model.Entity.User;
-import com.example.delivery_service.model.UserDetailsImpl;
 import com.example.delivery_service.services.RoleService;
 import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,18 +24,18 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
-    private final RoleService roleService;
     private final StateService stateService;
     private final PasswordEncoder passwordEncoder;
     private final MessageSource messageSource;
+    private final RoleService roleService;
 
     @Autowired
-    public UserController(UserService userService, RoleService roleService, StateService stateService, PasswordEncoder passwordEncoder, MessageSource messageSource) {
+    public UserController(UserService userService, StateService stateService, PasswordEncoder passwordEncoder, MessageSource messageSource, RoleService roleService) {
         this.userService = userService;
-        this.roleService = roleService;
         this.stateService = stateService;
         this.passwordEncoder = passwordEncoder;
         this.messageSource = messageSource;
+        this.roleService = roleService;
     }
 
     /**LIST*/
@@ -123,12 +122,17 @@ public class UserController {
     @RequestMapping(value = "/user/edit/{id}", method = RequestMethod.GET)
     public String editUser(@PathVariable("id") Long id, @RequestParam("prof") boolean isProfile, HttpServletRequest request, Model model){
 
-        model.addAttribute("states", stateService.getAllStates());
+
 
         //kontrola práv
         if(request.isUserInRole("ADMIN") || User.getCurrentUser().getId().equals(id)){
             model.addAttribute("isProfile", isProfile);
             User user = userService.getUserById(id).orElse(null);
+            model.addAttribute("roleId", user != null
+                    ? user.getRoles().iterator().next().getId()
+                    : roleService.getDefaultRole().orElse(new Role()).getId());
+            model.addAttribute("roles", roleService.getAllRoles());
+            model.addAttribute("states", stateService.getAllStates());
             model.addAttribute("user", user);
             return "userEdit";
         }
@@ -139,11 +143,23 @@ public class UserController {
     /**UPDATE*/
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)
-    public String updateUser(@Valid @ModelAttribute("user") User user,
+    public String updateUser(@ModelAttribute("user") User user,
+                             @ModelAttribute("roleId") String roleId,
                              @ModelAttribute("newPassword") String newPassword,
                              @ModelAttribute("isProfile") boolean isProfile,
-                             HttpServletRequest request,
-                             Model model){
+                             Model model,
+                             HttpServletRequest request){
+
+        model.addAttribute("roles", roleService.getAllRoles());
+        model.addAttribute("states", stateService.getAllStates());
+
+        //kontola jména a emailu
+        if(user.getFullname().isEmpty() || user.getEmail().isEmpty()){
+            model.addAttribute("user", user);
+            String message = messageSource.getMessage("error.name.email.is.required", null, LocaleContextHolder.getLocale());
+            model.addAttribute("errorMessage", message);
+            return "userEdit";
+        }
 
         //kontrola práv
         if(request.isUserInRole("ADMIN") || User.getCurrentUser().getId().equals(user.getId()))
@@ -162,12 +178,24 @@ public class UserController {
                 if (origOptUser.isPresent()) {
                     User origUser = origOptUser.get();
 
-                    if (passwordEncoder.matches(user.getPassword(), origUser.getPassword())) {
+                    //kontrola hesla
+                    if (request.isUserInRole("ADMIN") || passwordEncoder.matches(user.getPassword(), origUser.getPassword())) {
 
+                        //new password
                         if (newPassword.isEmpty()) {
                             user.setPassword(origUser.getPassword());
                         } else {
                             user.setPassword(passwordEncoder.encode(newPassword));
+                        }
+
+                        //role
+                        long lRoleId;
+                        try{lRoleId = Long.valueOf(roleId);}
+                        catch(Exception ex){lRoleId = -1;}
+                        if(request.isUserInRole("ADMIN") && lRoleId > 0){
+                            user.setRoles(new HashSet<>(Collections.singletonList(
+                                    roleService.getRoleById(lRoleId).orElse(
+                                            roleService.getDefaultRole().orElse(null)))));
                         }
 
                         userService.saveOrUpdate(user);
@@ -175,7 +203,7 @@ public class UserController {
                         if (isProfile)
                             return "redirect:/profile";
                         else
-                            return "user/detail" + user.getId();
+                            return "redirect:/user/detail/" + user.getId() + "?prof=false";
                     } else {
                         model.addAttribute("user", user);
                         String message = messageSource.getMessage("error.bad.original.password", null, LocaleContextHolder.getLocale());

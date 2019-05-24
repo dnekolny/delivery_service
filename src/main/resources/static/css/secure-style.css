@@ -1,5 +1,26 @@
+html{
+    height: 100%;
+}
+
 body {
+    height: 100%;
     font-size: .875rem;
+}
+
+#main{
+    overflow: auto;
+    padding-bottom: 50px; /*výška footer*/
+}
+
+#container{
+    min-height: 99.2%;
+}
+
+#footer{
+    position: relative;
+    height: 50px;
+    margin-top: -50px;
+    clear: both;
 }
 
 .feather {
@@ -103,4 +124,57 @@ body {
 .form-control-dark:focus {
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+}
+
+
+#progress {
+    width: 0;
+    transition: width 1s;
+    transition-timing-function: ease;
+    -webkit-transition: width 1s; /* For Safari 3.1 to 6.0 */
+    -webkit-transition-timing-function: ease;
+}
+
+/*PAY METHODS*/
+.cc-selector input{
+    margin:0;padding:0;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+}
+
+.credit-card{background-image:url('/img/card2.png');}
+.paypal{background-image:url('/img/paypal.png');}
+.cash{background-image:url('/img/cash.png');}
+
+.cc-selector input:active +.drinkcard-cc{opacity: .9;}
+.cc-selector input:checked +.drinkcard-cc{
+    -webkit-filter: none;
+    -moz-filter: none;
+    filter: none;
+}
+.drinkcard-cc{
+    cursor:pointer;
+    background-size:contain;
+    background-repeat:no-repeat;
+    display:inline-block;
+    width:100px;height:70px;
+    -webkit-transition: all 100ms ease-in;
+    -moz-transition: all 100ms ease-in;
+    transition: all 100ms ease-in;
+    -webkit-filter: brightness(1.8) grayscale(1) opacity(.7);
+    -moz-filter: brightness(1.8) grayscale(1) opacity(.7);
+    filter: brightness(1.8) grayscale(1) opacity(.7);
+}
+.drinkcard-cc:hover{
+    -webkit-filter: brightness(1.2) grayscale(.5) opacity(.9);
+    -moz-filter: brightness(1.2) grayscale(.5) opacity(.9);
+    filter: brightness(1.2) grayscale(.5) opacity(.9);
+}
+
+.bank-card-img{
+    background-size:contain;
+    background-repeat:no-repeat;
+    display:inline-block;
+    width:120px;height:84px;
 }

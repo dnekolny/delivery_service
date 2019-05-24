@@ -9,61 +9,44 @@
 
         <div th:replace="fragments/layout :: header('user')"></div>
 
-
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Users</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group mr-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                        <span data-feather="calendar"></span>
-                        This week
-                    </button>
+        <div id="container">
+            <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Users</h1>
                 </div>
-            </div>
 
-            <div class="table-responsive" th:if="${not #lists.isEmpty(users)}">
-                <table class="table table-hover">
-                    <tr>
-                        <th scope="col">Id</th>
-                        <th scope="col">Fullname</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Phone number</th>
-                        <th scope="col">Create Date</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.id}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
-                        <td th:text="${user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
-                        <td th:text="${user.email}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
-                        <td th:text="${user.phoneNumber}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
-                        <td th:text="${user.createDate}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
-                        <td>
-                            <a th:href="@{/user/edit/} + ${user.id} + '?prof=false'" class="text-primary">
-                                <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
-                            <a th:href="@{/user/delete/} + ${user.id}" class="ml-1 text-danger" th:onclick="'return confirm(\'' + #{confirm.delete.user(${user.id})} + '\')'">
-                                <span style="width: 20px; height: 20px" data-feather="trash-2"></span></a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+                <div class="table-responsive" th:if="${not #lists.isEmpty(users)}">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Fullname</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Phone number</th>
+                            <th scope="col">Create Date</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                            <td th:text="${user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                            <td th:text="${user.roles[0].name}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                            <td th:text="${user.email}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                            <td th:text="${user.phoneNumber}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                            <td th:text="${user.createDate}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
+                            <td>
+                                <a th:href="@{/user/edit/} + ${user.id} + '?prof=false'" class="text-primary">
+                                    <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
+                                <a th:href="@{/user/delete/} + ${user.id}" class="ml-1 text-danger" th:onclick="'return confirm(\'' + #{confirm.delete.user(${user.id})} + '\')'">
+                                    <span style="width: 20px; height: 20px" data-feather="trash-2"></span></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
 
-        </main>
+            </main>
+        </div>
 
-        <script th:inline="javascript">
-
-           feather.replace();
-
-           jQuery(document).ready(function($) {
-               $(".clickable-cell").click(function() {
-                   window.location = $(this).data("href");
-               });
-           });
-
-       </script>
+        <footer th:replace="fragments/layout :: footer"></footer>
 
 </body>
 </html>

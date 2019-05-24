@@ -1,11 +1,18 @@
 package com.example.delivery_service.model.Entity;
 
 
+import com.example.delivery_service.services.UserService;
+import org.hibernate.annotations.Cascade;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 
@@ -36,6 +43,11 @@ public class User extends Partner {
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER, cascade={CascadeType.MERGE,CascadeType.REFRESH})
     private Set<Role> roles;
 
+    @OneToMany(targetEntity = Order.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL) //pokud smažu uživatele smaže to i všechny jeho objednávky
+    //@Cascade(org.hibernate.annotations.CascadeType.DELETE)
+    @JoinColumn(name = "user_id")
+    private List<Order> orders;
+
     public User() {
         super();
     }
@@ -46,10 +58,33 @@ public class User extends Partner {
         this.roles = user.getRoles();
     }
 
+    public static User getCurrentUserFromDb(UserService userService) {
+        User user = null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if(auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+            user = (User) auth.getPrincipal();
+
+            if (user != null) {
+                user = userService.getUserById(user.getId()).orElse(null);
+
+                if(user != null) {
+                    user.setPassword("");
+                }
+            }
+        }
+        return user;
+    }
+
     public static User getCurrentUser(){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(user != null) {
-            user.setPassword("");
+        User user = null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if(auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
+            user = (User) auth.getPrincipal();
+            if (user != null) {
+                user.setPassword("");
+            }
         }
         return user;
     }
@@ -68,5 +103,13 @@ public class User extends Partner {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 }

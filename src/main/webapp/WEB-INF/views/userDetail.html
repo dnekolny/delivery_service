@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head th:insert="fragments/layout :: head('Delivery service - User')">
     <meta charset="UTF-8">
     <title>users</title>
@@ -14,56 +14,105 @@
     <div th:replace="fragments/layout :: header('user')"></div>
 </div>
 
-
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2" th:text="${user.fullname}">Name</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group mr-2">
-                <button type="button" class="btn btn-sm btn-primary" th:onclick="'location.href=\'' + @{/user/edit/} + ${user.id} + '?prof='+ ${isProfile} +'\';'">
-                    <span data-feather="edit"></span>
-                    Edit
-                </button>
-                <button type="button" id="buttonDelete" class="btn btn-sm btn-outline-danger"
-                        th:attr="data-message=#{confirm.delete.user(${user.id})},
-                                 data-href=@{/user/delete/} + ${user.id}">
-                    <span data-feather="trash-2"></span>
-                    Delete
-                </button>
+<div id="container">
+    <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2" th:text="${user.fullname}">Name</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                    <a class="btn btn-sm btn-primary" th:href="@{/user/edit/} + ${user.id} + '?prof='+ ${isProfile}">
+                        <span data-feather="edit"></span>
+                        <span th:text="#{edit.name}">Edit</span>
+                    </a>
+                    <button sec:authorize="hasRole('ADMIN')" type="button" id="buttonDelete" class="btn btn-sm btn-outline-danger"
+                            th:attr="data-message=#{confirm.delete.user(${user.id})},
+                                     data-href=@{/user/delete/} + ${user.id}">
+                        <span data-feather="trash-2"></span>
+                        <span th:text="#{delete.name}">Delete</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-sm-6 col-lg-4">
-            <p class="text-muted mb-1" th:text="#{email.name} + ':'"></p>
-            <p class="ml-2 font-weight-bold" th:text="${user.email}"></p>
+
+        <div class="row">
+            <div class="col-lg-6 col-xl-4">
+                <div class="card mb-2">
+                    <div class="card-header" th:text="#{basic.information.name}">
+                        Basic information
+                    </div>
+                    <div class="card-body pb-2">
+                        <p>
+                            <span th:text="#{fullname.name} + ': '"></span>
+                            <span class="font-weight-bold" th:text="${user.fullname}"></span>
+                        </p>
+                        <p>
+                            <span th:text="#{email.name} + ': '"></span>
+                            <span class="font-weight-bold" th:text="${user.email}"></span>
+                        </p>
+                        <p>
+                            <span th:text="#{phone.number.name} + ': '"></span>
+                            <span class="font-weight-bold" th:text="${user.phoneNumber}"></span>
+                        </p>
+                        <p sec:authorize="hasRole('ADMIN')" class="pt-3">
+                            <span th:text="#{role.name} + ': '"></span>
+                            <span class="font-weight-bold" th:text="${user.roles[0].name}"></span>
+                        </p>
+                        <p sec:authorize="hasRole('ADMIN')">
+                            <span th:text="#{create.date.name} + ': '"></span>
+                            <span class="font-weight-bold" th:text="${user.createDate}"></span>
+                        </p>
+                        <p sec:authorize="hasRole('ADMIN')">
+                            <span th:text="#{update.date.name} + ': '"></span>
+                            <span class="font-weight-bold" th:text="${user.updateDate}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!--NOTE-->
+            <div class="col-lg-6 col-xl-4">
+                <div class="card mb-2">
+                    <div class="card-header" th:text="#{address.name}">
+                        Address
+                    </div>
+                    <div class="card-body pb-2">
+                        <div th:if="${user.address == null || user.address.id == null}">
+                            <p class="text-warning" th:text="#{address.missing.message}">Address is missing</p>
+                            <a class="btn btn-sm btn-primary mb-2" th:text="#{btn.add.address}"
+                               th:href="@{/user/edit/} + ${user.id} + '?prof=' + ${isProfile} + '#adr'">Add address</a>
+                        </div>
+
+                        <div th:if="${user.address != null && user.address.id != null}">
+                            <p>
+                                <span th:text="#{address.city.name} + ': '"></span>
+                                <span class="font-weight-bold" th:text="${user.address.city}"></span>
+                            </p>
+                            <p>
+                                <span th:text="#{address.street.name} + ': '"></span>
+                                <span class="font-weight-bold" th:text="${user.address.street}"></span>
+                            </p>
+                            <p>
+                                <span th:text="#{address.state.name} + ': '"></span>
+                                <span class="font-weight-bold" th:text="${user.address.state.name}"></span>
+                            </p>
+                            <p>
+                                <span th:text="#{address.zip.name} + ': '"></span>
+                                <span class="font-weight-bold" th:text="${user.address.zip}"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-6 col-lg-8">
-            <p class="text-muted mb-1" th:text="#{phone.number.name} + ':'"></p>
-            <p class="ml-2 font-weight-bold" th:text="${user.phoneNumber}"></p>
-        </div>
-    </div>
 
-    <p class="text-muted mb-2" th:text="#{address.name} + ':'"></p>
-    <a th:if="${user.address == null || user.address.id == null}" class="btn btn-sm btn-primary ml-2" th:href="@{/user/edit/} + ${user.id} + '?prof=' + ${isProfile} + '#adr'" th:text="#{btn.add.address}">Add address</a>
+        <h4 class="h4 mt-3" th:text="#{orders} + ':'">Orders</h4>
+        <div th:replace="orders :: ordersList(${user.orders})"></div>
 
-    <table class="table table-sm table-borderless ml-4 col-sm-5 col-xl-2 " th:if="${user.address != null && user.address.id != null}">
-        <tr>
-            <td class="text-muted" th:text="#{address.city.name} + ':'">City:</td>
-            <td class="font-weight-bold" th:text="${user.address.city}">...</td>
-        </tr>
-        <tr>
-            <td class="text-muted" th:text="#{address.street.name} + ':'">Street:</td>
-            <td class="font-weight-bold" th:text="${user.address.street}">...</td>
-        </tr>
-        <tr>
-            <td class="text-muted" th:text="#{address.zip.name} + ':'">Zip:</td>
-            <td class="font-weight-bold" th:text="${user.address.zip}">...</td>
-        </tr>
-    </table>
+    </main>
+</div>
 
-</main>
+<footer th:replace="fragments/layout :: footer"></footer>
 
 <script>
     $('#buttonDelete').on('click', function () {

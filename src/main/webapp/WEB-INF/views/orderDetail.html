@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head th:insert="fragments/layout :: head('Delivery service - Order')">
+    <meta charset="UTF-8">
+    <title>users</title>
+</head>
+<body>
+
+
+<div>
+    <div th:replace="fragments/layout :: header('Order')"></div>
+</div>
+
+<div id="container">
+    <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2" th:text="#{order.name} + ' (' + ${order.createDate} + ')'">Order (21.5.2018)</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                    <a class="btn btn-sm btn-outline-primary" th:href=" @{/orders} ">
+                        <span data-feather="arrow-left"></span>
+                        <span th:text="#{btn.order.list}">Back</span>
+                    </a>
+                    <a class="btn btn-sm btn-primary" sec:authorize="hasRole('ADMIN')" th:href=" @{/order/edit/} + ${order.id} ">
+                        <span data-feather="edit"></span>
+                        <span th:text="#{edit.name}">Edit</span>
+                    </a>
+                    <button type="button" id="buttonDelete" sec:authorize="hasRole('ADMIN')" class="btn btn-sm btn-outline-danger"
+                            th:attr="data-message=#{confirm.delete.order(${order.id})},
+                                     data-href=@{/order/delete/} + ${order.id}">
+                        <span data-feather="trash-2"></span>
+                        <span th:text="#{delete.name}">Delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!--ORDER STATE-->
+        <div class="card mb-2">
+            <div class="card-header" th:text="#{state.name}">
+                Order state
+            </div>
+            <div class="card-body pt-0 pb-0 clearfix">
+                <p class="m-2">
+                    <span th:text="#{order.state.name}+': '"></span>
+                    <span class="font-weight-bold" th:classappend="${order.state.name() == 'DELIVERED'} ? 'text-success' : 'text-primary'"
+                          th:text="#{${order.state.getResourceName()}}"></span>
+                </p>
+            </div>
+        </div>
+
+        <!--PAYMENT-->
+        <div class="card mb-2">
+            <div class="card-header" th:text="#{payment.name}">
+                Payment
+            </div>
+            <div class="card-body pt-2 pb-0 clearfix">
+
+                <div th:switch="${order.payment.payMethod.name()}">
+                    <div th:case="'CARD'">
+                        <div class="m-2 mr-3 bank-card-img credit-card float-left"></div>
+                    </div>
+                    <div th:case="'PAYPAL'">
+                        <div class="m-2 mr-3 bank-card-img paypal float-left"></div>
+                    </div>
+                    <div th:case="'CASH'">
+                        <div class="m-2 mr-3 bank-card-img cash float-left"></div>
+                    </div>
+                </div>
+
+                <p class="m-2">
+                    <span th:text="#{price.name}+': '"></span>
+                    <span class="font-weight-bold" th:text="${order.payment.price} + ' Kč'"></span>
+                </p>
+                <p class="mb-2">
+                    <span th:text="#{payment.method.name} + ': '"></span>
+                    <span class="font-weight-bold" th:text="${order.payment.payMethod}"></span>
+                </p>
+                <p>
+                    <span th:text="#{payed.name} + ': '"></span>
+                    <span class="font-weight-bold"
+                          th:text="${order.payment.payDate == null} ? #{not.payed.name} : ${order.payment.payDate}"
+                          th:classappend="${order.payment.payDate == null} ? text-warning : text-success"></span>
+                </p>
+            </div>
+        </div>
+
+        <div th:fragment="orderSum(order)">
+            <div class="row">
+                <!--CUSTOMER-->
+                <div class="col-md-6">
+                    <div class="card mb-2">
+                        <div class="card-header" th:text="#{sender.address.name}">
+                            Sender/Pickup address
+                        </div>
+                        <div class="card-body pb-2">
+                            <p><span th:text="#{partner.fullname.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.fullname}"></span></p>
+                            <p><span th:text="#{address.street.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.street}"></span></p>
+                            <p><span th:text="#{address.city.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.city}"></span></p>
+                            <p><span th:text="#{address.state.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.state.name}"></span></p>
+                            <p><span th:text="#{address.zip.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.zip}"></span></p>
+                            <p><span th:text="#{email.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.email}"></span></p>
+                            <p><span th:text="#{phone.number.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.phoneNumber}"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <!--RECIPIENT-->
+                <div class="col-md-6">
+                    <div class="card mb-2">
+                        <div class="card-header" th:text="#{recipient.address.name}">
+                            Recipient/Delivery address
+                        </div>
+                        <div class="card-body pb-2">
+                            <p><span th:text="#{partner.fullname.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.fullname}"></span></p>
+                            <p><span th:text="#{address.street.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.street}"></span></p>
+                            <p><span th:text="#{address.city.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.city}"></span></p>
+                            <p><span th:text="#{address.state.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.state.name}"></span></p>
+                            <p><span th:text="#{address.zip.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.zip}"></span></p>
+                            <p><span th:text="#{email.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.email}"></span></p>
+                            <p><span th:text="#{phone.number.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.phoneNumber}"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--PACKAGE-->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-2">
+                        <div class="card-header" th:text="#{package.name}">
+                            Package
+                        </div>
+                        <div class="card-body pb-2">
+
+                            <p>
+                                <span th:text="#{package.size.category} + ': '"></span>
+                                <span class="font-weight-bold" th:text="${order.aPackage.sizeCategory}"></span>
+                            </p>
+                            <p>
+                                <span th:text="#{pickup.type.name} + ': '"></span>
+                                <span class="font-weight-bold" th:text="${order.pickupType}"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!--NOTE-->
+                <div class="col-md-6">
+                    <div class="card mb-2">
+                        <div class="card-header" th:text="#{note.name}">
+                            Note
+                        </div>
+                        <div class="card-body pb-2">
+
+                            <p th:text="${order.note}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--PRICE-->
+            <div class="card mb-2">
+                <div class="card-header" th:text="#{price.name}">
+                    Price
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col" th:text="#{item.name}">Item</th>
+                            <th scope="col" th:text="#{value.name}">Value</th>
+                            <th scope="col" th:text="#{price.name}">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td th:text="#{package.size.category}">Size category</td>
+                            <td th:text="${order.aPackage.sizeCategory}">0</td>
+                            <td th:text="${order.aPackage.sizeCategory.getPrice()} + ' Kč'">0</td>
+                        </tr>
+                        <tr>
+                            <td th:text="#{pickup.type.name}">Pickup Type</td>
+                            <td th:text="${order.pickupType}">0</td>
+                            <td th:text="${order.pickupType.getPrice()} + ' Kč'">0</td>
+                        </tr>
+                        <tr class="table-info">
+                            <td></td>
+                            <td th:text="#{total.name}">Total</td>
+                            <td class="font-weight-bold" th:text="${order.payment.price} + ' Kč'">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<footer th:replace="fragments/layout :: footer"></footer>
+
+<script>
+    $('#buttonDelete').on('click', function () {
+        var result = confirm($(this).data("message"));
+        if (result) {
+            window.location = $(this).data("href");
+        }
+    })
+</script>
+
+</body>
+</html>

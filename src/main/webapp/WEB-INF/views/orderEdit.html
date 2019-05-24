@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/layout :: head('Delivery service - Order')">
+    <meta charset="UTF-8">
+    <title>users</title>
+</head>
+<body>
+
+
+<div>
+    <div th:replace="fragments/layout :: header('Order')"></div>
+</div>
+
+<div id="container">
+    <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2 mb-2">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2" th:text="#{order.name} + ' (' + ${order.createDate} + ')'">Order (21.5.2018)</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group mr-2">
+                    <button type="button" class="btn btn-sm btn-primary" th:onclick="'location.href=\'' + @{/order/detail/}+${order.id} + '\';'">
+                        <span data-feather="arrow-left"></span>
+                        Back
+                    </button>
+                    <button type="button" id="buttonDelete" class="btn btn-sm btn-outline-danger"
+                            th:attr="data-message=#{confirm.delete.order(${order.id})},
+                                     data-href=@{/order/delete/} + ${order.id}">
+                        <span data-feather="trash-2"></span>
+                        <span th:text="#{delete.name}">Delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <form class="needs-validation" method="post" th:action="@{/order/update}" th:object="${order}" th:fragment="signupForm" novalidate>
+
+            <!--ORDER STATE-->
+            <div class="card mb-2">
+                <div class="card-header" th:text="#{order.state.name}">
+                    Order state
+                </div>
+                <div class="card-body pt-2 pb-2">
+                    <div class="row ml-0">
+
+                        <!--STATE-->
+                        <div class="form-group col-lg-5">
+                            <label for="orderState" th:text="#{state.name}">State</label>
+                            <select id="orderState" class="form-control" th:field="*{state}"
+                                    th:classappend="${#fields.hasErrors('state')} ? 'is-invalid'" required >
+                                <option th:each="state : ${T(com.example.delivery_service.model.Enums.OrderState).values()}" th:value="${state.name()}" th:text="${state}">state</option>
+                            </select>
+                            <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{order.state.name})}">status je povinné</span>
+                        </div>
+
+                        <!--PAYMENT-->
+                        <div class="form-group col-lg-7 mb-0">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <p class="mb-1" th:text="#{payed.name}"></p>
+                                    <div class="form-check ml-2">
+                                        <input class="form-check-input" type="radio" name="paid" id="paidRadio" value="true"
+                                               th:checked="*{payment.payDate != null}">
+                                        <label class="form-check-label" for="paidRadio">
+                                            Paid
+                                        </label>
+                                    </div>
+                                    <div class="form-check ml-2">
+                                        <input class="form-check-input" type="radio" name="paid" id="unpaidRadio" value="false"
+                                               th:checked="*{payment.payDate == null}">
+                                        <label class="form-check-label" for="unpaidRadio">
+                                            Unpaid
+                                        </label>
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{payed.name})}">placení je povinné</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9 mt-4 mt-md-2" th:insert="orderSummary :: payMethodEdit"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--FRAGMENTS-->
+            <div th:replace="newOrder :: orderForm(true)"></div>
+        </form>
+
+</main>
+</div>
+
+<footer th:replace="fragments/layout :: footer"></footer>
+
+<script>
+    $('#buttonDelete').on('click', function () {
+        var result = confirm($(this).data("message"));
+        if (result) {
+            window.location = $(this).data("href");
+        }
+    })
+</script>
+
+</body>
+</html>

@@ -9,12 +9,264 @@
 
 <div th:replace="fragments/layout :: header('newOrder')"></div>
 
+<div id="container">
+    <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2 mb-2">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2" th:text="#{nav.order.new}">New order</h1>
+        </div>
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
+        <!--PROGRESS-->
+        <div class="progress mb-2">
+            <div id="progress" class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                 aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
 
-    <h3>New ORDER</h3>
 
-</main>
+
+            <form class="needs-validation" method="post" th:action="${update} ? @{/order/update} : @{/order/sum}" th:object="${order}" novalidate>
+
+                <div th:fragment="orderForm(update)">
+
+                    <!--HIDDEN-->
+                <input hidden th:field="*{id}" >
+                <!--<input hidden th:field="*{customer.id}" >
+                <input hidden th:field="*{recipient.id}" >
+                <input hidden th:if="*{customer.address != null}" th:field="*{customer.address.id}">
+                <input hidden th:if="*{customer.address != null && customer.address.state != null}" th:field="*{customer.address.state.id}">
+                <input hidden th:if="*{recipient.address != null}" th:field="*{recipient.address.id}">
+                <input hidden th:if="*{recipient.address != null && recipient.address.state != null}" th:field="*{recipient.address.state.id}">-->
+
+                <!--SIZE CATEGORY-->
+                <div class="card mb-2">
+                    <div class="card-header" th:text="#{package.size.category}">
+                        Size category
+                    </div>
+                    <div class="card-body col-lg-8 pt-2 pb-2">
+                        <table class="pSizeTable table table-borderless mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" th:text="#{category.name}">Kategorie</th>
+                                    <th scope="col" th:text="#{measures.name}">Rozměry</th>
+                                    <th scope="col" th:text="#{price.name}">Cena</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="size : ${T(com.example.delivery_service.model.Enums.SizeCategory).values()}">
+                                    <td>
+                                        <input type="radio" th:id="${size.name()}" class="form-check-input" th:value="${size.name()}" th:field="*{aPackage.sizeCategory}"
+                                               th:classappend="${#fields.hasErrors('aPackage.sizeCategory')} ? 'is-invalid'" required/>
+                                        <label class="form-check-label" th:for="${size.name()}" th:text="${size.toString()}">Shipping Types</label>
+                                        <span th:if="${size.name() == 'BIG'}" class="text-danger invalid-feedback"
+                                              th:text="#{radio.check.required.message}">velikost balíku je povinné pole
+                                        </span>
+                                    </td>
+                                    <td th:text="${size.getMeasures()}"></td>
+                                    <td th:text="${size.getPrice()} + ' Kč'"></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!--PICKUP TYPE-->
+                <div class="card mb-2">
+                    <div class="card-header" th:text="#{pickup.type.name}">
+                        Pickup type
+                    </div>
+                    <div class="card-body pt-2 pb-2">
+                        <div class="row ml-0">
+                            <div th:each="pickType : ${T(com.example.delivery_service.model.Enums.PickupType).values()}"
+                                class="col-6">
+
+                                <input type="radio" th:id="${pickType.name()}" class="form-check-input" th:value="${pickType.name()}" th:field="*{pickupType}"
+                                       th:classappend="${#fields.hasErrors('pickupType')} ? 'is-invalid'" required/>
+                                <label class="form-check-label" th:for="${pickType.name()}" th:text="${pickType.toString()}">Pickup Types</label>
+                                <span class="font-weight-bold" th:text="${' (' + pickType.getPrice() + ' Kč)'}">cena</span>
+                                <span th:if="${pickType.name() == 'PICKUP'}" class="text-danger invalid-feedback"
+                                      th:text="#{radio.check.required.message}">způsob předání je povinné pole
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-2">
+
+                    <!--HIDDEN USER-->
+                    <input hidden id="userFullname" th:field="*{user.fullname}">
+                    <input hidden id="userEmail" th:field="*{user.email}">
+                    <input hidden id="userPhoneNumber" th:field="*{user.phoneNumber}">
+                    <div th:if="*{user.address != null}">
+                        <input hidden id="userStreet" th:field="*{user.address.street}">
+                        <input hidden id="userCity" th:field="*{user.address.city}">
+                        <input hidden id="userState" th:field="*{user.address.state.shortcut}">
+                        <input hidden id="userZip" th:field="*{user.address.zip}">
+                    </div>
+
+                    <div class="card-header" th:text="#{address.name}">
+                        Address
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!--CUSTOMER-->
+                            <div class="col-lg-6">
+                                <p>
+                                    <span class="font-weight-bold" th:text="#{sender.address.name}">Sender/Pickup address</span>
+                                    <span><button type="button" id="btnFillCustomer" class="btn btn-primary btn-sm float-right" th:text="#{btn.fill.sender.fields}"></button></span>
+                                </p>
+                                <div class="ml-1">
+                                    <!--FULL NAME-->
+                                    <div class="form-group">
+                                        <label for="cusFullname" th:text="#{partner.fullname.name}">Fullname/Company name</label>
+                                        <input id="cusFullname" type="text" class="form-control" th:field="*{customer.fullname}"
+                                               th:classappend="${#fields.hasErrors('customer.fullname')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{partner.fullname.name})}">jméno je povinné</span>
+                                    </div>
+                                    <!--STREET-->
+                                    <div class="form-group">
+                                        <label for="cusStreet" th:text="#{address.street.name}">Street</label>
+                                        <input id="cusStreet" type="text" class="form-control" th:field="*{customer.address.street}"
+                                               th:classappend="${#fields.hasErrors('customer.address.street')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.street.name})}">ulice je povinné</span>
+                                    </div>
+                                    <!--CITY-->
+                                    <div class="form-group">
+                                        <label for="cusCity" th:text="#{address.city.name}">City</label>
+                                        <input id="cusCity" type="text" class="form-control" th:field="*{customer.address.city}"
+                                               th:classappend="${#fields.hasErrors('customer.address.city')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.city.name})}">město je povinné</span>
+                                    </div>
+                                    <!--STATE-->
+                                    <div class="form-group">
+                                        <label for="cusState" th:text="#{address.state.name}">State</label>
+                                        <select id="cusState" class="form-control" th:field="*{customer.address.state.shortcut}"
+                                                th:classappend="${#fields.hasErrors('customer.address.state.shortcut')} ? 'is-invalid'" required >
+                                            <option th:each="state : ${states}" th:value="${state.shortcut}" th:text="${state.name}">state</option>
+                                        </select>
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.state.name})}">město je povinné</span>
+                                    </div>
+                                    <!--ZIP-->
+                                    <div class="form-group">
+                                        <label for="cusZip" th:text="#{address.zip.name}">Zip</label>
+                                        <input id="cusZip" type="text" class="form-control" th:field="*{customer.address.zip}"
+                                               th:classappend="${#fields.hasErrors('customer.address.zip')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.zip.name})}">zip je povinné</span>
+                                    </div>
+                                    <!--EMAIL-->
+                                    <div class="form-group">
+                                        <label for="cusEmail" th:text="#{email.name}">Email</label>
+                                        <input id="cusEmail" type="text" class="form-control" th:field="*{customer.email}"
+                                                   th:classappend="${#fields.hasErrors('customer.email')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{email.message}">zadejte validní email</span>
+                                    </div>
+                                    <!--PHONE NUMBER-->
+                                    <div class="form-group">
+                                        <label for="cusPhoneNumber" th:text="#{phone.number.name}">Telephone number</label>
+                                        <input id="cusPhoneNumber" type="text" class="form-control" th:field="*{customer.phoneNumber}" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--RECIPIENT-->
+                            <div class="col-lg-6">
+                                <p class="font-weight-bold" th:text="#{recipient.address.name}">Recipient/Delivery address</p>
+                                <div class="ml-1">
+                                    <!--FULL NAME-->
+                                    <div class="form-group">
+                                        <label for="recFullname" th:text="#{partner.fullname.name}">Fullname/Company name</label>
+                                        <input id="recFullname" type="text" class="form-control" th:field="*{recipient.fullname}"
+                                               th:classappend="${#fields.hasErrors('recipient.fullname')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{partner.fullname.name})}">jméno je povinné</span>
+                                    </div>
+                                    <!--STREET-->
+                                    <div class="form-group">
+                                        <label for="recStreet" th:text="#{address.street.name}">Street</label>
+                                        <input id="recStreet" type="text" class="form-control" th:field="*{recipient.address.street}"
+                                               th:classappend="${#fields.hasErrors('recipient.address.street')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.street.name})}">ulice je povinné</span>
+                                    </div>
+                                    <!--CITY-->
+                                    <div class="form-group">
+                                        <label for="recCity" th:text="#{address.city.name}">City</label>
+                                        <input id="recCity" type="text" class="form-control" th:field="*{recipient.address.city}"
+                                               th:classappend="${#fields.hasErrors('recipient.address.city')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.city.name})}">město je povinné</span>
+                                    </div>
+                                    <!--STATE-->
+                                    <div class="form-group">
+                                        <label for="recState" th:text="#{address.state.name}">State</label>
+                                        <select id="recState" class="form-control" th:field="*{recipient.address.state.shortcut}"
+                                                th:classappend="${#fields.hasErrors('recipient.address.state.shortcut')} ? 'is-invalid'" required >
+                                            <option th:each="state : ${states}" th:value="${state.shortcut}" th:text="${state.name}">state</option>
+                                        </select>
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.state.name})}">město je povinné</span>
+                                    </div>
+                                    <!--ZIP-->
+                                    <div class="form-group">
+                                        <label for="recZip" th:text="#{address.zip.name}">Zip</label>
+                                        <input id="recZip" type="text" class="form-control" th:field="*{recipient.address.zip}"
+                                               th:classappend="${#fields.hasErrors('recipient.address.zip')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{notBlank.message(#{address.zip.name})}">zip je povinné</span>
+                                    </div>
+                                    <!--EMAIL-->
+                                    <div class="form-group">
+                                        <label for="recEmail" th:text="#{email.name}">Email</label>
+                                        <input id="recEmail" type="text" class="form-control" th:field="*{recipient.email}"
+                                               th:classappend="${#fields.hasErrors('recipient.email')} ? 'is-invalid'" required />
+                                        <span class="text-danger invalid-feedback" th:text="#{email.message}">zadejte validní email</span>
+                                    </div>
+                                    <!--PHONE NUMBER-->
+                                    <div class="form-group">
+                                        <label for="recPhoneNumber" th:text="#{phone.number.name}">Telephone number</label>
+                                        <input id="recPhoneNumber" type="text" class="form-control" th:field="*{recipient.phoneNumber}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--NOTE-->
+                <div class="card mb-2">
+                    <div class="card-header" th:text="#{note.name}">
+                        Note
+                    </div>
+                    <div class="card-body p-0">
+                        <textarea id="note" rows="3" class="form-control" th:field="*{note}" style="border: 0;"></textarea>
+                    </div>
+                </div>
+
+                <button id="submitButton" type="submit" class="btn btn-primary pl-4 pr-4 float-right" th:text="${update} ? #{btn.save} : #{btn.next.step}">Next step</button>
+                <div class="clearfix"></div>
+
+                </div>
+            </form>
+
+
+        <script>
+            jQuery(document).ready(function() {
+                setTimeout(function () {
+                    $('#progress').css('width', '33%');
+                }, 500)
+
+
+                $('#btnFillCustomer').click(function () {
+                    $('#cusFullname').val($('#userFullname').val());
+                    $('#cusStreet').val($('#userStreet').val());
+                    $('#cusCity').val($('#userCity').val());
+                    $('#cusState').val($('#userState').val());
+                    $('#cusZip').val($('#userZip').val());
+                    $('#cusEmail').val($('#userEmail').val());
+                    $('#cusPhoneNumber').val($('#userPhoneNumber').val());
+                })
+            })
+        </script>
+
+    </main>
+</div>
+
+<footer th:replace="fragments/layout :: footer"></footer>
 
 </body>
 </html>

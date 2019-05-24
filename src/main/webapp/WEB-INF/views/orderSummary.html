@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/layout :: head('Delivery service - Shrnutí/Platba')">
+    <meta charset="UTF-8">
+    <title>users</title>
+</head>
+<body>
+
+
+<div th:replace="fragments/layout :: header('Order Summary & Payment')"></div>
+
+<div id="container">
+    <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2 mb-2">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2" th:text="#{nav.order.summary}">Order summary</h1>
+        </div>
+
+        <!--PROGRESS-->
+        <div class="progress mb-2">
+            <div id="progress" class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                 aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 33%"></div>
+        </div>
+
+        <!--<div th:replace="orderDetail :: senderRecipient(${order})"></div>
+        <div th:replace="orderDetail :: package(${order})"></div>
+        <div th:replace="orderDetail :: payment(${order})"></div>-->
+
+        <div th:replace="orderDetail :: orderSum(${order})"></div>
+
+
+        <!--PAY METHOD-->
+        <form class="needs-validation" method="post" th:action="@{/order/add}" th:object="${order}" th:fragment="orderSummary" novalidate>
+
+
+
+                <div class="card mb-2">
+                    <div class="card-header" th:text="#{payment.method.name}">
+                        Payment Method
+                    </div>
+                    <div class="card-body pb-0">
+                        <div class="cc-selector" th:fragment="payMethodEdit">
+                            <input checked="checked" id="credit-card" type="radio" name="payment-method" value="CARD" th:field="*{payment.payMethod}" required />
+                            <label class="drinkcard-cc credit-card" for="credit-card"></label>
+                            <input id="paypal" type="radio" name="payment-method" value="PAYPAL" th:field="*{payment.payMethod}" required />
+                            <label class="drinkcard-cc paypal" for="paypal"></label>
+                            <input id="cash" type="radio" name="payment-method" value="CASH" th:field="*{payment.payMethod}" required />
+                            <label class="drinkcard-cc cash" for="cash"></label>
+                            <span class="text-danger invalid-feedback"
+                                  th:text="#{radio.check.required.message}">způsob platby je povinné pole
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            <button id="prevButton" onclick="window.history.go(-1); return false;" class="btn btn-outline-secondary pl-4 pr-4 mt-2"
+                    th:text="#{btn.previous.step}">Previous step</button>
+            <button id="submitButton" type="submit" class="btn btn-primary pl-4 pr-4 mt-2 float-right" th:text="#{btn.pay}">Pay</button>
+            <div class="clearfix"></div>
+        </form>
+
+        <!--<form class="needs-validation" method="post" th:action="@{/order/payment}" th:fragment="orderSummary" novalidate>
+
+
+            <button id="prevButton" type="button" class="btn btn-outline-secondary pl-4 pr-4 mt-2" th:text="#{btn.previous.step}">Previous step</button>
+            <button id="submitButton" type="submit" class="btn btn-primary pl-4 pr-4 mt-2 float-right" th:text="#{btn.next.step}">Next step</button>
+            <div class="clearfix"></div>
+        </form>-->
+
+        <!--<a th:href="@{/order/payment}" class="btn btn-primary pl-4 pr-4 mt-2 float-right" th:text="#{payment.name}">Payment</a>
+        <div class="clearfix"></div>-->
+
+        <script>
+            jQuery(document).ready(function() {
+                setTimeout(function () {
+                    $('#progress').css('width', '66%');
+                }, 500)
+
+            })
+        </script>
+
+    </main>
+</div>
+
+<footer th:replace="fragments/layout :: footer"></footer>
+
+</body>
+</html>

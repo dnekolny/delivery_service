@@ -24,7 +24,7 @@ public class RoleService {
     }
 
 
-    public List<Role> getAllRoless() {
+    public List<Role> getAllRoles() {
         return (List<Role>) repository.findAll();
     }
 
@@ -36,6 +36,10 @@ public class RoleService {
 
     public void removeRole(Long id) {
         repository.deleteById(id);
+    }
+
+    public Optional<Role> getDefaultRole(){
+        return getRoleByName("CUSTOMER");
     }
 
 

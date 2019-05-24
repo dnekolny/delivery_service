@@ -1,5 +1,8 @@
 package com.example.delivery_service.model.Entity;
 
+import com.example.delivery_service.services.StateService;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -17,7 +20,7 @@ public class Address {
     private Date updateDate;
 
     @NotNull
-    @ManyToOne(targetEntity = State.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = State.class, fetch = FetchType.EAGER)
     private State state;
 
     @NotBlank
@@ -55,6 +58,20 @@ public class Address {
 
     public boolean isValid(){
         return (state != null && !state.getShortcut().isEmpty() && !street.isEmpty() && !city.isEmpty() && !zip.isEmpty());
+    }
+
+    public void fillStateFromShortcut(StateService stateService){
+        if(getState() != null && !getState().getShortcut().equals("")) {
+            setState(stateService.getStateByShortcut(getState().getShortcut()).orElse(null));
+        }
+    }
+
+    public void setCreateAndUpdateDates(Address address){
+        if(address != null)
+            setCreateDate(address.getCreateDate());
+        else
+            setCreateDate(new Date());
+        setUpdateDate(new Date());
     }
 
     public Long getId() {

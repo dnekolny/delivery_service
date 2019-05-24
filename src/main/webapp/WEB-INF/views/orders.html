@@ -1,53 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org"  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
-<head th:insert="fragments/layout :: head('Delivery service - Orders')">
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head th:insert="fragments/layout :: head('Delivery service - Objednávky')">
     <meta charset="UTF-8">
-    <title>orders</title>
+    <title>users</title>
 </head>
 <body>
+    <div th:replace="fragments/layout :: header('Orders')"></div>
 
-
-<div th:replace="fragments/layout :: header('order')"></div>
-
-
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Orders</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group mr-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+    <div id="container">
+        <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2" th:text="#{orders}">Orders</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a class="btn btn-sm btn-primary mr-2"
+                            th:href="'/order/new'">
+                        <span data-feather="plus"></span>
+                        <span th:text="#{new.order.name}">Create new order</span>
+                    </a>
+                </div>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <span data-feather="calendar"></span>
-                This week
-            </button>
-        </div>
+
+            <div th:fragment="ordersList(orders)">
+                <div class="table-responsive" th:if="${not #lists.isEmpty(orders)}">
+                    <table class="table table-hover">
+                        <tr>
+                            <th scope="col" th:text="#{create.date.name}">Create date</th>
+                            <th scope="col" sec:authorize="hasRole('ADMIN')" th:text="#{owner.name}">Owner</th>
+                            <th scope="col" th:text="#{sender.name}">From</th>
+                            <th scope="col" th:text="#{recipient.name}">To</th>
+                            <th scope="col" th:text="#{payed.name}">Payed</th>
+                            <th scope="col" th:text="#{order.state.name}">State</th>
+                            <th scope="col" sec:authorize="hasRole('ADMIN')" th:text="#{actions.name}">Actions</th>
+                        </tr>
+                        <tr th:each="order : ${orders}">
+                            <td th:text="${order.createDate}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <td sec:authorize="hasRole('ADMIN')" th:text="${order.user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <td th:text="${order.customer.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <td th:text="${order.recipient.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <td th:text="${order.payment.payDate == null} ? #{not.payed.name} : ${order.payment.payDate}"
+                                th:classappend="${order.payment.payDate == null} ? text-warning : text-success"
+                                class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id} "></td>
+                            <td th:text="#{${order.state.getResourceName()}}" class="clickable-cell"
+                                th:classappend="${order.state.name() == 'DELIVERED'} ? 'text-success' : 'text-primary'"
+                                style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <td sec:authorize="hasRole('ADMIN')">
+                                <a th:href="@{/order/edit/} + ${order.id}" class="text-primary">
+                                    <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
+                                <a th:href="@{/order/delete/} + ${order.id}" class="ml-1 text-danger" th:onclick="'return confirm(\'' + #{confirm.delete.order(${order.id})} + '\')'">
+                                    <span style="width: 20px; height: 20px" data-feather="trash-2"></span></a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div th:if="${#lists.isEmpty(orders)}">
+                    <p class="text-muted" th:text="#{no.order.found}">Aktuálně nemáte žádnou objednávku</p>
+                    <a class="btn btn-primary" th:text="#{create.new.order.name}" th:href="'/order/new'"></a>
+                </div>
+            </div>
+
+    </main>
     </div>
 
-    <!--CONTENT-->
-
-    <div sec:authorize="hasRole('ROLE_ADMIN')">IS ADMIN1</div>
-
-    <div sec:authorize="hasRole('ROLE_CUSTOMER')">IS CUSTOMER1</div>
-
-    <div sec:authorize="hasRole('ADMIN')">IS ADMIN2</div>
-
-    <div sec:authorize="hasRole('CUSTOMER')">IS CUSTOMER2</div>
-
-    <div sec:authorize="hasAuthority('ROLE_ADMIN')">IS ADMIN3</div>
-
-    <div sec:authorize="hasAuthority('ROLE_CUSTOMER')">IS CUSTOMER3</div>
-
-    <div sec:authorize="hasAuthority('ADMIN')">IS ADMIN4</div>
-
-    <div sec:authorize="hasAuthority('CUSTOMER')">IS CUSTOMER4</div>
-
-    <div sec:authorize="isAuthenticated()">IS AUTHENTICATED</div>
-
-    <div sec:authorize="isAnonymous()">IS ANONYMOUS</div>
-
-</main>
+    <footer th:replace="fragments/layout :: footer"></footer>
 
 </body>
 </html>

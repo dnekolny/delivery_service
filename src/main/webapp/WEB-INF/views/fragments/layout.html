@@ -32,39 +32,33 @@
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" th:classappend="${pageName == 'dashboard'} ? 'active'" href="#">
-                                <span data-feather="home"></span>
-                                <span th:text="#{nav.dashboard}">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" th:classappend="${pageName == 'profile'} ? 'active'" th:href="@{/profile}">
                                 <span data-feather="user"></span>
-                                <span th:text="#{nav.profile}">Profile</span>
+                                <span th:text="#{profile}">Profile</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:classappend="${pageName == 'order'} ? 'active'" th:href="@{/orders}">
+                            <a class="nav-link" th:classappend="${pageName == 'Orders' || pageName == 'Order'} ? 'active'" th:href="@{/orders}">
                                 <span data-feather="file"></span>
-                                <span th:text="#{nav.orders}">Orders</span>
+                                <span th:text="#{orders}">Orders</span>
                             </a>
                         </li>
                         <li class="nav-item ml-2">
                             <a class="nav-link pt-1" th:classappend="${pageName == 'newOrder'} ? 'active'" th:href="@{/order/new}">
-                                <span style="color: green;" data-feather="plus-square"></span>
-                                <span th:text="#{nav.order.new}">New order</span>
+                                <span class="text-success" data-feather="plus-square"></span>
+                                <span th:text="#{new.order}">New order</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:classappend="${pageName == 'product'} ? 'active'" href="#">
-                                <span data-feather="shopping-cart"></span>
-                                <span>Products</span>
+                        <li class="nav-item" sec:authorize="hasRole('DRIVER')">
+                            <a class="nav-link" th:classappend="${pageName == 'delivery'} ? 'active'" href="#">
+                                <span class="text-primary" data-feather="truck"></span>
+                                <span th:text="#{delivery}">Delivery</span>
                             </a>
                         </li>
                         <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                             <a class="nav-link" th:classappend="${pageName == 'user'} ? 'active'" th:href="@{/users}">
                                 <span data-feather="users"></span>
-                                <span th:text="#{nav.users}">Users</span>
+                                <span th:text="#{users}">Users</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -82,8 +76,8 @@
                     </ul>
 
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span th:text="#{nav.orders.current}">Current orders</span>
-                        <a class="d-flex align-items-center text-muted" href="#">
+                        <span th:text="#{current.orders}">Current orders</span>
+                        <a class="d-flex align-items-center text-muted" th:href="@{/order/new}">
                             <span data-feather="plus-circle"></span>
                         </a>
                     </h6>
@@ -127,18 +121,17 @@
     <script>
         jQuery(document).ready(function() {
             feather.replace();
+
+            $(".clickable-cell").click(function() {
+                window.location = $(this).data("href");
+            });
         })
     </script>
 </header>
 
-<footer class="bg-dark text-white mt-4" style="z-index: 2000!important;" th:fragment="footer">
+<footer id="footer" class="bg-dark text-white p-2 col-md-9 ml-sm-auto col-lg-10" th:fragment="footer">
     <div>
-        CoreUI
-        <span>&copy; 2018 creativeLabs.</span>
-    </div>
-    <div class="ml-auto">
-        <span>Powered by</span>
-        <a href="https://coreui.io">CoreUI</a>
+        <span>&copy; 2019 Delivery Service.</span>
     </div>
 
     <script>

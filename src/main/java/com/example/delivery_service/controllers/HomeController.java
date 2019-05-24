@@ -6,6 +6,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 public class HomeController {
 
@@ -17,7 +19,10 @@ public class HomeController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(Model model){
+    public String login(Model model, HttpServletRequest request){
+        if(User.getCurrentUser() != null){
+            return "redirect:/orders";
+        }
         model.addAttribute(new User());
         return "login";
     }
@@ -30,5 +35,10 @@ public class HomeController {
     @RequestMapping(value = "/404", method = RequestMethod.GET)
     public String error404(){
         return "errors/404";
+    }
+
+    @RequestMapping(value = "/map", method = RequestMethod.GET)
+    public String map(){
+        return "map";
     }
 }

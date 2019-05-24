@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" th:lang="#{lang}" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="fragments/layout :: head('Delivery service - Platba')">
+    <meta charset="UTF-8">
+    <title>users</title>
+</head>
+<body>
+
+
+<div th:replace="fragments/layout :: header('Order Payment')"></div>
+
+
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2" th:text="#{nav.order.new}">New order</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <span data-feather="calendar"></span>
+                This week
+            </button>
+        </div>
+    </div>
+
+    <!--PROGRESS-->
+    <div class="progress mb-2">
+        <div id="progress" class="progress-bar progress-bar-striped bg-success" role="progressbar"
+             aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+
+    <div class="row">
+        <!--CUSTOMER-->
+        <div class="col-md-6">
+            <div class="card mb-2">
+                <div class="card-header" th:text="#{sender.address.name}">
+                    Sender/Pickup address
+                </div>
+                <div class="card-body pb-2">
+                    <p><span th:text="#{partner.fullname.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.fullname}"></span></p>
+                    <p><span th:text="#{address.street.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.street}"></span></p>
+                    <p><span th:text="#{address.city.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.city}"></span></p>
+                    <p><span th:text="#{address.state.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.state.name}"></span></p>
+                    <p><span th:text="#{address.zip.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.address.zip}"></span></p>
+                    <p><span th:text="#{email.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.email}"></span></p>
+                    <p><span th:text="#{phone.number.name} + ': '"></span><span class="font-weight-bold" th:text="${order.customer.phoneNumber}"></span></p>
+                </div>
+            </div>
+        </div>
+        <!--RECIPIENT-->
+        <div class="col-md-6">
+            <div class="card mb-2">
+                <div class="card-header" th:text="#{recipient.address.name}">
+                    Recipient/Delivery address
+                </div>
+                <div class="card-body pb-2">
+                    <p><span th:text="#{partner.fullname.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.fullname}"></span></p>
+                    <p><span th:text="#{address.street.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.street}"></span></p>
+                    <p><span th:text="#{address.city.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.city}"></span></p>
+                    <p><span th:text="#{address.state.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.state.name}"></span></p>
+                    <p><span th:text="#{address.zip.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.address.zip}"></span></p>
+                    <p><span th:text="#{email.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.email}"></span></p>
+                    <p><span th:text="#{phone.number.name} + ': '"></span><span class="font-weight-bold" th:text="${order.recipient.phoneNumber}"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--PACKAGE-->
+    <div class="card mb-2">
+        <div class="card-header" th:text="#{package.name}">
+            Package
+        </div>
+        <div class="card-body pb-2">
+            <p><span th:text="#{package.size.category} + ': '"></span><span class="font-weight-bold" th:text="${order.aPackage.sizeCategory}"></span></p>
+            <p><span th:text="#{pickup.type.name} + ': '"></span><span class="font-weight-bold" th:text="${order.pickupType}"></span></p>
+        </div>
+    </div>
+    <!--PRICE-->
+    <div class="card mb-2">
+        <div class="card-header" th:text="#{price.name}">
+            Price
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead>
+                <tr>
+                    <th scope="col" th:text="#{item.name}">Item</th>
+                    <th scope="col" th:text="#{value.name}">Value</th>
+                    <th scope="col" th:text="#{price.name}">Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td th:text="#{package.size.category}">Size category</td>
+                    <td th:text="${order.aPackage.sizeCategory}">0</td>
+                    <td th:text="${order.aPackage.sizeCategory.getPrice()} + ' Kč'">0</td>
+                </tr>
+                <tr>
+                    <td th:text="#{pickup.type.name}">Pickup Type</td>
+                    <td th:text="${order.pickupType}">0</td>
+                    <td th:text="${order.pickupType.getPrice()} + ' Kč'">0</td>
+                </tr>
+                <tr class="table-info">
+                    <td></td>
+                    <td th:text="#{total.name}">Total</td>
+                    <td class="font-weight-bold" th:text="${totalPrice} + ' Kč'">0</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <form class="needs-validation" method="post" th:action="@{/order/payment}" th:fragment="orderSummary" novalidate>
+
+
+        <button id="prevButton" type="button" class="btn btn-outline-secondary pl-4 pr-4 mt-2" th:text="#{btn.previous.step}">Previous step</button>
+        <button id="submitButton" type="submit" class="btn btn-primary pl-4 pr-4 mt-2 float-right" th:text="#{btn.next.step}">Next step</button>
+        <div class="clearfix"></div>
+    </form>
+
+    <script>
+        jQuery(document).ready(function() {
+            $('#progress').css('width', '50%');
+        })
+    </script>
+
+</main>
+
+<footer th:replace="fragments/layout :: footer"></footer>
+
+</body>
+</html>
