@@ -34,4 +34,16 @@ public enum SizeCategory{
 
         return 0;
     }
+
+    public String getResourceName() {
+        switch(this){
+            case SMALL:
+                return "enum.small";
+            case MEDIUM:
+                return "enum.medium";
+            case BIG:
+                return "enum.big";
+        }
+        return "";
+    }
 }

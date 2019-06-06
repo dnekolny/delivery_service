@@ -20,33 +20,65 @@
                 </div>
             </div>
 
+            <div th:if="${addErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="#{error.order.save.failed} + ': ' + ${addErrorMessage}" />
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
             <div th:fragment="ordersList(orders)">
                 <div class="table-responsive" th:if="${not #lists.isEmpty(orders)}">
                     <table class="table table-hover">
                         <tr>
                             <th scope="col" th:text="#{create.date.name}">Create date</th>
-                            <th scope="col" sec:authorize="hasRole('ADMIN')" th:text="#{owner.name}">Owner</th>
+                            <th scope="col" sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')" th:text="#{owner.name}">Owner</th>
                             <th scope="col" th:text="#{sender.name}">From</th>
                             <th scope="col" th:text="#{recipient.name}">To</th>
+                            <th scope="col" sec:authorize="hasRole('DRIVER')" th:text="#{address.name}">Address</th>
                             <th scope="col" th:text="#{payed.name}">Payed</th>
-                            <th scope="col" th:text="#{order.state.name}">State</th>
-                            <th scope="col" sec:authorize="hasRole('ADMIN')" th:text="#{actions.name}">Actions</th>
+                            <th scope="col" sec:authorize="!hasRole('DRIVER')" th:text="#{order.state.name}">State</th>
+                            <th scope="col" sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')" th:text="#{actions.name}">Actions</th>
                         </tr>
                         <tr th:each="order : ${orders}">
-                            <td th:text="${order.createDate}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
-                            <td sec:authorize="hasRole('ADMIN')" th:text="${order.user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
-                            <td th:text="${order.customer.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
-                            <td th:text="${order.recipient.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <td th:text="${order.createDate}" class="clickable-cell" style="cursor: pointer;"
+                                th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
+                            <td sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')" th:text="${order.user.fullname}" class="clickable-cell" style="cursor: pointer;"
+                                th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
+                            <td th:text="${order.customer.fullname}" class="clickable-cell" style="cursor: pointer;"
+                                th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
+                            <td th:text="${order.recipient.fullname}" class="clickable-cell" style="cursor: pointer;"
+                                th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
+                            <td sec:authorize="hasRole('DRIVER')" th:text="${order.getDriveFormatAddress()}" class="clickable-cell" style="cursor: pointer;"
+                                th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
                             <td th:text="${order.payment.payDate == null} ? #{not.payed.name} : ${order.payment.payDate}"
                                 th:classappend="${order.payment.payDate == null} ? text-warning : text-success"
                                 class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id} "></td>
-                            <td th:text="#{${order.state.getResourceName()}}" class="clickable-cell"
-                                th:classappend="${order.state.name() == 'DELIVERED'} ? 'text-success' : 'text-primary'"
-                                style="cursor: pointer;" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
-                            <td sec:authorize="hasRole('ADMIN')">
-                                <a th:href="@{/order/edit/} + ${order.id}" class="text-primary">
+
+                            <td sec:authorize="!hasRole('DRIVER')" th:text="#{${order.state.getResourceName()}}" class="clickable-cell"
+                                th:classappend="${order.state.name() == 'DELIVERED'} ? 'text-success' : 'text-primary'" style="cursor: pointer;"
+                                th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
+                            <td sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')">
+                                <a th:href="@{/order/edit/} + ${order.id}" class="text-primary mr-1">
                                     <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
-                                <a th:href="@{/order/delete/} + ${order.id}" class="ml-1 text-danger" th:onclick="'return confirm(\'' + #{confirm.delete.order(${order.id})} + '\')'">
+
+                                <a sec:authorize="hasRole('DRIVER')" class="btnMap text-warning mr-1"
+                                   style="cursor: pointer;" th:attr="data-address=${order.getDriveFormatAddress()}">
+                                    <span style="width: 20px; height: 20px" data-feather="map"></span></a>
+
+                                <a sec:authorize="hasRole('DRIVER')" th:id="'btnTruck_' + ${order.id}" class="btnTruck"
+                                   style="cursor: pointer;" th:attr="data-order-id=${order.id}"
+                                   th:classappend="${T(com.example.delivery_service.controllers.DeliveryController).deliveryOrdersContains(order.id)} ? 'text-primary' : 'text-secondary'">
+                                    <span style="width: 20px; height: 20px" data-feather="truck"></span></a>
+
+                                <a sec:authorize="hasRole('ADMIN')" th:href="@{/order/delete/} + ${order.id}" class="ml-1 text-danger"
+                                   th:onclick="'return confirm(\'' + #{confirm.delete.order(${order.id})} + '\')'">
                                     <span style="width: 20px; height: 20px" data-feather="trash-2"></span></a>
                             </td>
                         </tr>
@@ -57,12 +89,82 @@
                     <p class="text-muted" th:text="#{no.order.found}">Aktuálně nemáte žádnou objednávku</p>
                     <a class="btn btn-primary" th:text="#{create.new.order.name}" th:href="'/order/new'"></a>
                 </div>
+
+
+                <div class="modal fade" id="map-modal">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+
+                            <div class="modal-body p-0" style="height: 500px;">
+                                <!--<div th:replace="map :: map(${apiKey})"></div>-->
+
+                                <div id="map"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script sec:authorize="hasRole('DRIVER')" th:inline="javascript">
+                    /*<![CDATA[*/
+
+                    $(document).ready(function () {
+                        $(".btnTruck").click(function () {
+                            var orderId = $(this).data("order-id");
+                            $.ajax({
+                                url: '/delivery/addOrderToDeliverList',
+                                type: 'POST',
+                                data: { id: orderId }, //JSON.stringify(orderId)
+                                success: function (data) {
+                                    var name = '#btnTruck_' + data.value0;
+                                    var btn = $(name);
+                                    if(data.value1){
+                                        btn.removeClass('text-secondary');
+                                        btn.addClass('text-primary');
+                                        //this.parent().value('text-primary')
+                                    }
+                                    else {
+                                        btn.removeClass('text-primary');
+                                        btn.addClass('text-secondary');
+                                        //this.value('text-secondary')
+                                    }
+                                    console.log(data);
+                                },
+                                error: function (a, b, c) {
+                                    console.log(a, b, c);
+                                }
+                            });
+                        });
+                    });
+
+                    $(".btnMap").click(function(){
+                        var driverAddress = /*[[${T(com.example.delivery_service.controllers.DeliveryController).getUserDriverAddress()}]]*/ '';
+                        var orderAddress = $(this).data("address");
+                        $('#map-modal').modal('show');
+
+                        setTimeout(function () {
+                            calculateAndDisplayRoute(driverAddress, orderAddress);
+                        }, 500);
+
+                    });
+
+                    $('#map-modal').on('hidden.bs.modal', function () {
+                        directionsDisplay.setDirections({routes: []});
+                    })
+
+                    /*]]>*/
+                </script>
+
+                <script async defer th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&callback=initMap'"></script>
+
             </div>
 
     </main>
     </div>
 
     <footer th:replace="fragments/layout :: footer"></footer>
+
+
 
 </body>
 </html>

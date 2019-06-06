@@ -49,6 +49,12 @@
                                 <span th:text="#{new.order}">New order</span>
                             </a>
                         </li>
+                        <li class="nav-item ml-2" sec:authorize="hasRole('DRIVER')">
+                            <a class="nav-link pt-1" th:classappend="${pageName == 'Map'} ? 'active'" th:href="@{/orders/map}">
+                                <span class="text-warning" data-feather="map"></span>
+                                <span th:text="#{orders.map}">Orders map</span>
+                            </a>
+                        </li>
                         <li class="nav-item" sec:authorize="hasRole('DRIVER')">
                             <a class="nav-link" th:classappend="${pageName == 'delivery'} ? 'active'" href="#">
                                 <span class="text-primary" data-feather="truck"></span>
@@ -117,6 +123,8 @@
     <script th:src="@{/webjars/bootstrap/4.3.0/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/js/feather.min.js}"></script>
     <script src="/js/form.validation.js"></script>
+
+    <script src="/js/google.map.js"></script>
 
     <script>
         jQuery(document).ready(function() {

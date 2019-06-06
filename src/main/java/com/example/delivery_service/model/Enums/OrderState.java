@@ -1,12 +1,10 @@
 package com.example.delivery_service.model.Enums;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 public enum OrderState {
-    WAITING_FOR_PACKAGE,
-    PROCESSING,
-    ON_ROAD,
-    DELIVERED;
+    WAITING_FOR_PACKAGE, //0
+    PROCESSING, //1
+    ON_ROAD, //2
+    DELIVERED; //3
 
     public String toString() {
         switch(this){
@@ -34,9 +32,7 @@ public enum OrderState {
                 return "enum.on.road";
             case DELIVERED:
                 return "enum.delivered";
-
         }
-
         return "";
     }
 }

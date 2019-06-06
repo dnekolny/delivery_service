@@ -12,7 +12,7 @@
 <div id="container">
     <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2 mb-2">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2" th:text="#{nav.order.new}">New order</h1>
+            <h1 class="h2" th:text="#{new.order}">New order</h1>
         </div>
 
         <!--PROGRESS-->
@@ -53,8 +53,8 @@
                             <tbody>
                                 <tr th:each="size : ${T(com.example.delivery_service.model.Enums.SizeCategory).values()}">
                                     <td>
-                                        <input type="radio" th:id="${size.name()}" class="form-check-input" th:value="${size.name()}" th:field="*{aPackage.sizeCategory}"
-                                               th:classappend="${#fields.hasErrors('aPackage.sizeCategory')} ? 'is-invalid'" required/>
+                                        <input type="radio" th:id="${size.name()}" class="form-check-input" th:value="${size.name()}" th:field="*{sizeCategory}"
+                                               th:classappend="${#fields.hasErrors('sizeCategory')} ? 'is-invalid'" required/>
                                         <label class="form-check-label" th:for="${size.name()}" th:text="${size.toString()}">Shipping Types</label>
                                         <span th:if="${size.name() == 'BIG'}" class="text-danger invalid-feedback"
                                               th:text="#{radio.check.required.message}">velikost balíku je povinné pole

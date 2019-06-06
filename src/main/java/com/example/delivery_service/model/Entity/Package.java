@@ -1,4 +1,4 @@
-package com.example.delivery_service.model.Entity;
+/*package com.example.delivery_service.model.Entity;
 
 
 import com.example.delivery_service.model.Enums.SizeCategory;
@@ -17,12 +17,11 @@ public class Package {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
+
     private Date createDate;
 
     private Date updateDate;
 
-    @NotNull
-    private SizeCategory sizeCategory;
 
     private double width;
     private double height;
@@ -94,7 +93,15 @@ public class Package {
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
     }
+
+    public Address getCurrentAddress() {
+        return currentAddress;
+    }
+
+    public void setCurrentAddress(Address currentAddress) {
+        this.currentAddress = currentAddress;
+    }
 }
 
 
-
+*/

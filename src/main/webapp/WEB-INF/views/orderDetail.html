@@ -35,6 +35,13 @@
             </div>
         </div>
 
+        <div th:if="${updateErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="#{error.order.update.failed} + ': ' + ${updateErrorMessage}" />
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
         <!--ORDER STATE-->
         <div class="card mb-2">
             <div class="card-header" th:text="#{state.name}">
@@ -133,7 +140,7 @@
 
                             <p>
                                 <span th:text="#{package.size.category} + ': '"></span>
-                                <span class="font-weight-bold" th:text="${order.aPackage.sizeCategory}"></span>
+                                <span class="font-weight-bold" th:text="${order.sizeCategory}"></span>
                             </p>
                             <p>
                                 <span th:text="#{pickup.type.name} + ': '"></span>
@@ -173,8 +180,8 @@
                         <tbody>
                         <tr>
                             <td th:text="#{package.size.category}">Size category</td>
-                            <td th:text="${order.aPackage.sizeCategory}">0</td>
-                            <td th:text="${order.aPackage.sizeCategory.getPrice()} + ' Kč'">0</td>
+                            <td th:text="${order.sizeCategory}">0</td>
+                            <td th:text="${order.sizeCategory.getPrice()} + ' Kč'">0</td>
                         </tr>
                         <tr>
                             <td th:text="#{pickup.type.name}">Pickup Type</td>

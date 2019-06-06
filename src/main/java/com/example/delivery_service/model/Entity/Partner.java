@@ -1,11 +1,13 @@
 package com.example.delivery_service.model.Entity;
 
+import com.example.delivery_service.model.Geocoder;
 import com.example.delivery_service.services.StateService;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.io.IOException;
 import java.util.Date;
 
 //firma nebo osoba, které bude balík doručen

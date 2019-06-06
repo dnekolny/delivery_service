@@ -5,6 +5,7 @@ import com.example.delivery_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -23,7 +24,7 @@ public class UserService {
     }
 
 
-    public void saveOrUpdate(User user) {
+    public void saveOrUpdate(User user) throws IOException {
 
         //ADDRESS
         if(user.getAddress() != null) {
@@ -33,9 +34,7 @@ public class UserService {
             else {
                 //nastaví State podle shortcut
                 user.getAddress().fillStateFromShortcut(stateService);
-                /*user.getAddress().setUpdateDate(new Date());
-                if(user.getAddress().getId() == null)
-                    user.getAddress().setCreateDate(new Date());*/
+                user.getAddress().findLatLgt();
             }
         }
 
@@ -51,6 +50,10 @@ public class UserService {
 
             user.setCreateAndUpdateDates(origUser);
             user.setOrders(origUser.getOrders());
+
+            //PASSWORD
+            if(user.getPassword().isEmpty())
+                user.setPassword(origUser.getPassword());
 
             //ROLES
             if (user.getRoles() == null || user.getRoles().size() == 0)

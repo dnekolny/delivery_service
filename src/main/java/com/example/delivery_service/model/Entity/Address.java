@@ -1,11 +1,12 @@
 package com.example.delivery_service.model.Entity;
 
+import com.example.delivery_service.model.Geocoder;
 import com.example.delivery_service.services.StateService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.Date;
 
 @Entity
@@ -31,6 +32,9 @@ public class Address {
 
     @NotBlank
     private String zip;
+
+    @OneToOne(targetEntity = LatLng.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private LatLng latLng;
 
     public Address(){}
 
@@ -72,6 +76,26 @@ public class Address {
         else
             setCreateDate(new Date());
         setUpdateDate(new Date());
+    }
+
+    public String getFormatAddress(boolean withState){
+        if(withState)
+            //Valdštejnovo nám. 44, Staré Město, 506 01 Jičín, Česko
+            return getStreet() + ", " + getZip() + " " + getCity() + ", " + getState().getName();
+        else
+            return getStreet() + ", " + getZip() + " " + getCity();
+    }
+
+    public static Address getOfficeAddress(StateService stateService){
+        //Ve žlíbku 1800/77, 193 00 Praha 9 - Horní Počernice-Praha 20
+        return new Address(null, null,
+                stateService.getStateByShortcut("CZ").orElse(null),
+                "Ve žlíbku 1800/77", "Praha 9","193 00");
+    }
+
+    public void findLatLgt() throws IOException {
+        Geocoder geo = new Geocoder();
+        setLatLng(geo.geocode(getFormatAddress(true)));
     }
 
     public Long getId() {
@@ -128,5 +152,13 @@ public class Address {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
     }
 }

@@ -1,8 +1,8 @@
 package com.example.delivery_service.model.Entity;
 
 import com.example.delivery_service.model.Enums.OrderState;
-import com.example.delivery_service.model.Enums.PayMethod;
 import com.example.delivery_service.model.Enums.PickupType;
+import com.example.delivery_service.model.Enums.SizeCategory;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -13,7 +13,6 @@ import java.util.Date;
 public class Order {
 
     @Id
-    //@GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
     private Date createDate;
@@ -21,36 +20,38 @@ public class Order {
     private Date updateDate;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //@MapsId
     private Payment payment;
 
     @NotNull
     private PickupType pickupType;
 
+    //private boolean isInBranch;
+
     private OrderState state;
+
+    @NotNull
+    private SizeCategory sizeCategory;
 
     private String note;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //@MapsId
-    @Valid
-    private Package aPackage;
-
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //@MapsId
     @Valid
     private Partner customer;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    //@MapsId
     @Valid
     private Partner recipient;
 
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "driver_id")
+    private User driver;
+
     public Order() {
-        this.aPackage = new Package();
+        //this.aPackage = new Package();
         this.customer = new Partner();
         this.recipient = new Partner();
     }
@@ -58,8 +59,8 @@ public class Order {
     public void setCreateAndUpdateDates(Order order){
         if(order != null){
             setCreateDate(order.getCreateDate());
-            if(getaPackage() != null)
-                getaPackage().setCreateAndUpdateDates(order.getaPackage());
+            /*if(getaPackage() != null)
+                getaPackage().setCreateAndUpdateDates(order.getaPackage());*/
             if(getPayment() != null)
                 getPayment().setCreateAndUpdateDates(order.getPayment());
             if(getRecipient() != null)
@@ -69,8 +70,8 @@ public class Order {
         }
         else{
             setCreateDate(new Date());
-            if(getaPackage() != null)
-                getaPackage().setCreateAndUpdateDates(null);
+            /*if(getaPackage() != null)
+                getaPackage().setCreateAndUpdateDates(null);*/
             if(getPayment() != null)
                 getPayment().setCreateAndUpdateDates(null);
             if(getRecipient() != null)
@@ -84,8 +85,8 @@ public class Order {
 
     public void setUpdateDates(){
         setUpdateDate(new Date());
-        if(aPackage != null)
-            aPackage.setUpdateDate(new Date());
+        /*if(aPackage != null)
+            aPackage.setUpdateDate(new Date());*/
         if(payment != null)
             payment.setUpdateDate(new Date());
         if(recipient != null)
@@ -95,9 +96,28 @@ public class Order {
     }
 
     public void countPrice(){
-        if(aPackage != null && aPackage.getSizeCategory() != null && pickupType != null && payment != null){
-            payment.setPrice(aPackage.getSizeCategory().getPrice() + pickupType.getPrice());
+        if(sizeCategory != null && pickupType != null && payment != null){
+            payment.setPrice(sizeCategory.getPrice() + pickupType.getPrice());
         }
+    }
+
+    public String getDriveFormatAddress(){
+        return getDriveAddress().getFormatAddress(true);
+    }
+
+    public Address getDriveAddress(){
+        Address address = null;
+
+        if(getPickupType() == PickupType.PICKUP && getState() == OrderState.WAITING_FOR_PACKAGE){
+            //customer address
+            address = getCustomer().getAddress();
+        }
+        else if(getState() != OrderState.DELIVERED){
+            //recipient address
+            address = getRecipient().getAddress();
+        }
+
+        return address;
     }
 
     public Long getId() {
@@ -130,14 +150,6 @@ public class Order {
 
     public void setNote(String note) {
         this.note = note;
-    }
-
-    public Package getaPackage() {
-        return aPackage;
-    }
-
-    public void setaPackage(Package aPackage) {
-        this.aPackage = aPackage;
     }
 
     public Partner getCustomer() {
@@ -187,4 +199,28 @@ public class Order {
     public void setState(OrderState state) {
         this.state = state;
     }
+
+    public SizeCategory getSizeCategory() {
+        return sizeCategory;
+    }
+
+    public void setSizeCategory(SizeCategory sizeCategory) {
+        this.sizeCategory = sizeCategory;
+    }
+
+    public User getDriver() {
+        return driver;
+    }
+
+    public void setDriver(User driver) {
+        this.driver = driver;
+    }
+
+    /*public boolean isInBranch() {
+        return isInBranch;
+    }
+
+    public void setInBranch(boolean inBranch) {
+        isInBranch = inBranch;
+    }*/
 }

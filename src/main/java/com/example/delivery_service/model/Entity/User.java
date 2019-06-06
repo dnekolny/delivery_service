@@ -3,6 +3,8 @@ package com.example.delivery_service.model.Entity;
 
 import com.example.delivery_service.services.UserService;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,34 +21,20 @@ import java.util.Set;
 @Entity
 public class User extends Partner {
 
-    /*@Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
-
-    private Date createDate;
-
-    private Date updateDate;
-
-    @NotBlank
-    private String name;*/
-
     @Size(min = 8)
     @NotBlank
     private String password;
 
-    /*@Email
-    @NotBlank
-    private String email;
-
-    private String phoneNumber;*/
-
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER, cascade={CascadeType.MERGE,CascadeType.REFRESH})
     private Set<Role> roles;
 
-    @OneToMany(targetEntity = Order.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL) //pokud smažu uživatele smaže to i všechny jeho objednávky
+    @OneToMany(targetEntity = Order.class, mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL) //pokud smažu uživatele smaže to i všechny jeho objednávky
     //@Cascade(org.hibernate.annotations.CascadeType.DELETE)
-    @JoinColumn(name = "user_id")
     private List<Order> orders;
+
+    @OneToMany(targetEntity = Order.class, mappedBy = "driver", cascade=CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Order> deliveryOrders;
 
     public User() {
         super();
@@ -77,11 +65,20 @@ public class User extends Partner {
     }
 
     public static User getCurrentUser(){
+        return  getCurrentUser(null);
+    }
+
+    public static User getCurrentUser(UserService userService){
         User user = null;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if(auth != null && !(auth instanceof AnonymousAuthenticationToken)) {
             user = (User) auth.getPrincipal();
+
+            if(userService != null && user != null){
+                user = userService.getUserById(user.getId()).orElse(null);
+            }
+
             if (user != null) {
                 user.setPassword("");
             }
@@ -111,5 +108,13 @@ public class User extends Partner {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
+    }
+
+    public List<Order> getDeliveryOrders() {
+        return deliveryOrders;
+    }
+
+    public void setDeliveryOrders(List<Order> deliveryOrders) {
+        this.deliveryOrders = deliveryOrders;
     }
 }

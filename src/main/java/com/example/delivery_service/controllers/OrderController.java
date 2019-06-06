@@ -1,10 +1,12 @@
 package com.example.delivery_service.controllers;
 
+import com.example.delivery_service.model.Entity.Address;
 import com.example.delivery_service.model.Entity.Order;
 import com.example.delivery_service.model.Enums.OrderState;
 import com.example.delivery_service.model.Entity.Payment;
 import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.model.Enums.PayMethod;
+import com.example.delivery_service.model.MapsApiKeyReader;
 import com.example.delivery_service.services.OrderService;
 import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -40,7 +43,14 @@ public class OrderController {
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public String orders(Model model, HttpServletRequest request) {
         if(request.isUserInRole("ADMIN")){
+            model.addAttribute("apiKey", MapsApiKeyReader.readKey());
+            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService));
             model.addAttribute("orders", orderService.getAllOrders());
+        }
+        else if(request.isUserInRole("DRIVER")){
+            model.addAttribute("apiKey", MapsApiKeyReader.readKey());
+            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService));
+            model.addAttribute("orders", orderService.getOrdersToDeliver(User.getCurrentUser().getId()));
         }
         else{
             model.addAttribute("orders", orderService.getOrdersByUserId(User.getCurrentUser().getId()));
@@ -100,18 +110,24 @@ public class OrderController {
     @RequestMapping(value= "/order/add", method = RequestMethod.POST)
     public String addOrder(HttpServletRequest request,
                            @ModelAttribute("order")Order orderWithPayment, //order obsahuje pouze payment
-                           Model model, HttpSession session) {
+                           Model model, HttpSession session, RedirectAttributes redir) {
 
-        Payment payment = orderWithPayment.getPayment();
-        Order order = (Order) session.getAttribute("order");
-        payment.setPrice(order.getPayment().getPrice());
-        payment.fakePay();
-        order.setPayment(payment);
+        try {
+            Payment payment = orderWithPayment.getPayment();
+            Order order = (Order) session.getAttribute("order");
+            payment.setPrice(order.getPayment().getPrice());
+            payment.fakePay();
+            order.setPayment(payment);
 
-        order.setUser(User.getCurrentUserFromDb(userService));
-        order.setState(OrderState.WAITING_FOR_PACKAGE);
+            order.setUser(User.getCurrentUserFromDb(userService));
+            order.setState(OrderState.WAITING_FOR_PACKAGE);
 
-        orderService.saveOrUpdate(order);
+            orderService.saveOrUpdate(order);
+        }
+        catch (Exception ex){
+            redir.addFlashAttribute("addErrorMessage", ex.getMessage());
+        }
+
         return "redirect:/orders";
     }
 
@@ -125,8 +141,10 @@ public class OrderController {
         Order order = orderService.getOrderById(id).orElse(null);
 
         //kontrola práv
-        if(order != null && (request.isUserInRole("ADMIN") || User.getCurrentUser().getId().equals(order.getUser().getId()))){
+        if(order != null && (request.isUserInRole("ADMIN") || request.isUserInRole("DRIVER") ||
+                User.getCurrentUser().getId().equals(order.getUser().getId()))){
             model.addAttribute("order", order);
+
             return "orderDetail";
         }
 
@@ -152,13 +170,19 @@ public class OrderController {
     @RequestMapping(value = "/order/update", method = RequestMethod.POST)
     public String updateOrder(@Valid @ModelAttribute("order") Order order,
                              @ModelAttribute("paid") boolean isPaid,
-                             HttpServletRequest request){
-        Payment p = new Payment();
-        if(isPaid)
-            p.setPayDate(new Date());
-        p.setPayMethod(order.getPayment().getPayMethod());
-        order.setPayment(p);
-        this.orderService.saveOrUpdate(order);
+                             HttpServletRequest request, RedirectAttributes redir){
+        try {
+            Payment p = new Payment();
+            if (isPaid)
+                p.setPayDate(new Date());
+            p.setPayMethod(order.getPayment().getPayMethod());
+            order.setPayment(p);
+
+            this.orderService.saveOrUpdate(order);
+        }
+        catch (Exception ex){
+            redir.addFlashAttribute("updateErrorMessage", ex.getMessage());
+        }
 
         return "redirect:/order/detail/" + order.getId();
     }

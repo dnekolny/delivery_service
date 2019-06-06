@@ -4,9 +4,8 @@ import com.example.delivery_service.model.Entity.Order;
 import com.example.delivery_service.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -19,7 +18,7 @@ public class OrderService {
         this.stateService = stateService;
     }
 
-    public void saveOrUpdate(Order order) {
+    public void saveOrUpdate(Order order) throws IOException {
 
         Optional<Order> origOptOrder = Optional.empty();
 
@@ -30,13 +29,15 @@ public class OrderService {
         /**EXIST*/
         if(origOptOrder.isPresent()){
             Order origOrder = origOptOrder.get();
+
             origOrder.setUpdateDates();
+            //origOrder.setInBranch(order.isInBranch());
 
             //state
             origOrder.setState(order.getState());
 
             //size category
-            origOrder.getaPackage().setSizeCategory(order.getaPackage().getSizeCategory());
+            origOrder.setSizeCategory(order.getSizeCategory());
 
             //pickup type
             origOrder.setPickupType(order.getPickupType());
@@ -59,36 +60,41 @@ public class OrderService {
             //note
             origOrder.setNote(order.getNote());
 
+            //driver
+            origOrder.setDriver(order.getDriver());
+
             order = origOrder;
-
-            /*order.setCreateAndUpdateDates(origOptOrder.get());
-
-            //payment
-            if(origOrder.getPayment().getPayDate() == null && order.getPayment().getPayDate() != null){
-                origOrder.getPayment().setPayDate(new Date());
-                order.setPayment(origOrder.getPayment());
-            }
-            else {
-                order.setPayment(origOrder.getPayment());
-            }
-
-            order.setUser(origOrder.getUser());
-
-            //size category
-            origOrder.getaPackage().setSizeCategory(order.getaPackage().getSizeCategory());
-            order.setaPackage(origOrder.getaPackage());*/
         }
         /**NEW*/
         else {
+            //order.setInBranch(false);
             order.setCreateAndUpdateDates(null);
             order.setId(ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE));
         }
+
+        //geocoding
+        if(order.getRecipient().getAddress() != null)
+            order.getRecipient().getAddress().findLatLgt();
+        if(order.getCustomer().getAddress() != null)
+            order.getCustomer().getAddress().findLatLgt();
 
         repository.save(order);
     }
 
     public List<Order> getAllOrders() {
         return (List<Order>) repository.findAll();
+    }
+
+    public List<Order> getWithoutDriver() {
+        return repository.getByDriverIsNull();
+    }
+
+    public List<Order> getByDriverId(Long id) {
+        return repository.getByDriver_Id(id);
+    }
+
+    public List<Order> getOrdersToDeliver(Long id) {
+        return repository.getOrdersToDeliver(id);
     }
 
     public Optional<Order> getOrderById(Long id) {

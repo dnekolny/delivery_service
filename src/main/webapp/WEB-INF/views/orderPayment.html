@@ -73,7 +73,7 @@
             Package
         </div>
         <div class="card-body pb-2">
-            <p><span th:text="#{package.size.category} + ': '"></span><span class="font-weight-bold" th:text="${order.aPackage.sizeCategory}"></span></p>
+            <p><span th:text="#{package.size.category} + ': '"></span><span class="font-weight-bold" th:text="${order.sizeCategory}"></span></p>
             <p><span th:text="#{pickup.type.name} + ': '"></span><span class="font-weight-bold" th:text="${order.pickupType}"></span></p>
         </div>
     </div>
@@ -94,8 +94,8 @@
                 <tbody>
                 <tr>
                     <td th:text="#{package.size.category}">Size category</td>
-                    <td th:text="${order.aPackage.sizeCategory}">0</td>
-                    <td th:text="${order.aPackage.sizeCategory.getPrice()} + ' Kč'">0</td>
+                    <td th:text="${order.sizeCategory}">0</td>
+                    <td th:text="${order.sizeCategory.getPrice()} + ' Kč'">0</td>
                 </tr>
                 <tr>
                     <td th:text="#{pickup.type.name}">Pickup Type</td>

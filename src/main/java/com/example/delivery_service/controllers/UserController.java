@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -148,7 +149,8 @@ public class UserController {
                              @ModelAttribute("newPassword") String newPassword,
                              @ModelAttribute("isProfile") boolean isProfile,
                              Model model,
-                             HttpServletRequest request){
+                             HttpServletRequest request,
+                             RedirectAttributes redir){
 
         model.addAttribute("roles", roleService.getAllRoles());
         model.addAttribute("states", stateService.getAllStates());
@@ -184,7 +186,7 @@ public class UserController {
                         //new password
                         if (newPassword.isEmpty()) {
                             user.setPassword(origUser.getPassword());
-                        } else {
+                        } else
                             user.setPassword(passwordEncoder.encode(newPassword));
                         }
 
@@ -198,24 +200,31 @@ public class UserController {
                                             roleService.getDefaultRole().orElse(null)))));
                         }
 
-                        userService.saveOrUpdate(user);
+                        try {
+                            userService.saveOrUpdate(user);
+                        }
+                        catch (Exception ex){
+                            String message = messageSource.getMessage("error.unexpected", null, LocaleContextHolder.getLocale());
+                            redir.addFlashAttribute("errorMessage", message);
+                        }
 
                         if (isProfile)
                             return "redirect:/profile";
                         else
                             return "redirect:/user/detail/" + user.getId() + "?prof=false";
+
                     } else {
                         model.addAttribute("user", user);
                         String message = messageSource.getMessage("error.bad.original.password", null, LocaleContextHolder.getLocale());
                         model.addAttribute("passwordErrorMessage", message);
                         return "userEdit";
                     }
-                } else {
+                /*} else {
                     model.addAttribute("user", user);
                     String message = messageSource.getMessage("error.something.is.wrong", null, LocaleContextHolder.getLocale());
                     model.addAttribute("errorMessage", message);
                     return "userEdit";
-                }
+                }*/
             }
         }
         else {
