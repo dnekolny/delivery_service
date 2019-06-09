@@ -32,7 +32,8 @@
                     <table class="table table-hover">
                         <tr>
                             <th scope="col" th:text="#{create.date.name}">Create date</th>
-                            <th scope="col" sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')" th:text="#{owner.name}">Owner</th>
+                            <th scope="col" sec:authorize="hasRole('ADMIN')" th:text="#{owner.name}">Owner</th>
+                            <th scope="col" sec:authorize="hasRole('DRIVER')" th:text="#{ready.to}">Ready to</th>
                             <th scope="col" th:text="#{sender.name}">From</th>
                             <th scope="col" th:text="#{recipient.name}">To</th>
                             <th scope="col" sec:authorize="hasRole('DRIVER')" th:text="#{address.name}">Address</th>
@@ -44,8 +45,14 @@
                             <td th:text="${order.createDate}" class="clickable-cell" style="cursor: pointer;"
                                 th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
 
-                            <td sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')" th:text="${order.user.fullname}" class="clickable-cell" style="cursor: pointer;"
+                            <td sec:authorize="hasRole('ADMIN')" th:text="${order.user.fullname}" class="clickable-cell" style="cursor: pointer;"
                                 th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+
+                            <div sec:authorize="hasRole('DRIVER')" th:switch="${order.isReadyToDeliver()}" class="clickable-cell" style="cursor: pointer;">
+                                <td th:case="1" th:text="#{delivery}" class="text-success" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                                <td th:case="0" th:text="#{pick.up}" class="text-primary" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                                <td th:case="*" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            </div>
 
                             <td th:text="${order.customer.fullname}" class="clickable-cell" style="cursor: pointer;"
                                 th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
@@ -138,12 +145,12 @@
                     });
 
                     $(".btnMap").click(function(){
-                        var driverAddress = /*[[${T(com.example.delivery_service.controllers.DeliveryController).getUserDriverAddress()}]]*/ '';
+                        var officeAddress = /*[[${officeAddress}]]*/ '';
                         var orderAddress = $(this).data("address");
                         $('#map-modal').modal('show');
 
                         setTimeout(function () {
-                            calculateAndDisplayRoute(driverAddress, orderAddress);
+                            calculateAndDisplayRoute(officeAddress, orderAddress);
                         }, 500);
 
                     });

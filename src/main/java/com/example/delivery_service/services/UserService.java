@@ -2,6 +2,7 @@ package com.example.delivery_service.services;
 
 import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.repository.UserRepository;
+import com.google.maps.errors.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,19 +25,7 @@ public class UserService {
     }
 
 
-    public void saveOrUpdate(User user) throws IOException {
-
-        //ADDRESS
-        if(user.getAddress() != null) {
-            if (user.getAddress().isEmpty())
-                //zabrání uložení prázdné adresy
-                user.setAddress(null);
-            else {
-                //nastaví State podle shortcut
-                user.getAddress().fillStateFromShortcut(stateService);
-                user.getAddress().findLatLgt();
-            }
-        }
+    public void saveOrUpdate(User user) throws ApiException, InterruptedException, IOException {
 
         Optional<User> origOptUser = Optional.empty();
 
@@ -58,6 +47,20 @@ public class UserService {
             //ROLES
             if (user.getRoles() == null || user.getRoles().size() == 0)
                 user.setRoles(origUser.getRoles());
+
+            //ADDRESS
+            if(user.getAddress() != null) {
+                if (user.getAddress().isEmpty())
+                    //zabrání uložení prázdné adresy
+                    user.setAddress(null);
+                else {
+                    if(origUser.getAddress() != null)
+                        user.getAddress().setId(origUser.getAddress().getId());
+                    //nastaví State podle shortcut
+                    user.getAddress().fillStateFromShortcut(stateService);
+                    user.getAddress().findLatLng();
+                }
+            }
         }
         /**NEW*/
         else{

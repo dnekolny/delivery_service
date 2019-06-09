@@ -20,6 +20,12 @@
             <h1 class="h2" th:text="${user.fullname}">Name</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group mr-2">
+                    <div th:if="${!isProfile}">
+                        <a class="btn btn-sm btn-outline-primary" th:href="@{/users}">
+                            <span data-feather="arrow-left"></span>
+                            <span th:text="#{list}">Edit</span>
+                        </a>
+                    </div>
                     <a class="btn btn-sm btn-primary" th:href="@{/user/edit/} + ${user.id} + '?prof='+ ${isProfile}">
                         <span data-feather="edit"></span>
                         <span th:text="#{edit.name}">Edit</span>

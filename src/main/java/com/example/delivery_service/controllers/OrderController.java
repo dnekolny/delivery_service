@@ -44,12 +44,12 @@ public class OrderController {
     public String orders(Model model, HttpServletRequest request) {
         if(request.isUserInRole("ADMIN")){
             model.addAttribute("apiKey", MapsApiKeyReader.readKey());
-            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService));
+            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService).getFormatAddress(true));
             model.addAttribute("orders", orderService.getAllOrders());
         }
         else if(request.isUserInRole("DRIVER")){
             model.addAttribute("apiKey", MapsApiKeyReader.readKey());
-            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService));
+            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService).getFormatAddress(true));
             model.addAttribute("orders", orderService.getOrdersToDeliver(User.getCurrentUser().getId()));
         }
         else{

@@ -35,16 +35,28 @@
                     </div>
                     <div class="modal-body pl-3 pr-3 pt-2 pb-2">
                         <p class="m-2">
+                            <span th:text="#{ready.to} + ': '">Ready to:</span>
+                            <span id="modalReadyTo" class="font-weight-bold text-success">Deliver</span>
+                        </p>
+                        <p class="m-2">
                             <span th:text="#{state.name} + ': '">Order state:</span>
                             <span id="modalState" class="font-weight-bold">State</span>
                         </p>
                         <p class="m-2">
-                            <span th:text="#{pickup.type.name} + ': '">Pickup type:</span>
-                            <span id="modalPickup" class="font-weight-bold">Pickup type</span>
-                        </p>
-                        <p class="m-2">
                             <span th:text="#{package.size.category} + ': '">Size category:</span>
                             <span id="modalSize" class="font-weight-bold">Size category</span>
+                        </p>
+                        <p class="m-2">
+                            <span th:text="#{sender.name} + ': '">Sender:</span>
+                            <span id="modalCustomer" class="font-weight-bold">Sender</span>
+                        </p>
+                        <p class="m-2">
+                            <span th:text="#{recipient.name} + ': '">Recipient:</span>
+                            <span id="modalRecipient" class="font-weight-bold">Recipient</span>
+                        </p>
+                        <p class="m-2">
+                            <span th:text="#{owner.name} + ': '">Owner:</span>
+                            <span id="modalUser" class="font-weight-bold">Owner</span>
                         </p>
                     </div>
                     <div class="modal-footer pl-3 pr-3 pt-2 pb-2">
@@ -71,7 +83,7 @@
             function initMarkersMap() {
                 var map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 8,
-                    center: {lat: 49.743292, lng: 15.526285} //50.079170, 14.430859
+                    center: {lat: 49.743292, lng: 15.526285}
                 });
 
                 data = [
@@ -86,6 +98,10 @@
                             /*[[#{${order.pickupType.getResourceName()}}]]*/,
                             /*[[#{${order.sizeCategory.getResourceName()}}]]*/,
                             /*[[${T(com.example.delivery_service.controllers.DeliveryController).deliveryOrdersContains(order.id)}]]*/,
+                            /*[[${order.isReadyToDeliver()}]]*/,
+                            /*[[${order.customer.fullname}]]*/,
+                            /*[[${order.recipient.fullname}]]*/,
+                            /*[[${order.user.fullname}]]*/
                         ],
 
                     /*[/]*/
@@ -130,16 +146,41 @@
                 var orderId = data[index][2];
                 var address = data[index][3];
                 var state = data[index][4];
-                var pickupType = data[index][5];
+                //var pickupType = data[index][5];
                 var sizeCategory = data[index][6];
                 var isInDeliverList = data[index][7];
+                var isReadyToDeliver = data[index][8];
+                var customerName = data[index][9];
+                var recipientName = data[index][10];
+                var userName = data[index][11];
 
                 $('#modalAddress').text(address);
                 $('#modalState').text(state);
-                $('#modalPickup').text(pickupType);
+                //$('#modalPickup').text(pickupType);
                 $('#modalSize').text(sizeCategory);
+                $('#modalCustomer').text(customerName);
+                $('#modalRecipient').text(recipientName);
+                $('#modalUser').text(userName);
+
+                //hidden
                 $('#modalOrderId').val(orderId);
                 $('#modalDataId').val(index);
+
+                //deliver/pickup
+                var readyToSpan = $('#modalReadyTo');
+                readyToSpan.text('');
+                if(isReadyToDeliver !== -1){
+                    if(isReadyToDeliver === 1){
+                        readyToSpan.text(/*[[#{delivery}]]*/);
+                        readyToSpan.removeClass('text-primary');
+                        readyToSpan.addClass('text-success');
+                    }
+                    else{
+                        readyToSpan.text(/*[[#{pick.up}]]*/);
+                        readyToSpan.removeClass('text-success');
+                        readyToSpan.addClass('text-primary');
+                    }
+                }
 
                 var btn = $('#modalSelect');
                 if(isInDeliverList){

@@ -1,13 +1,15 @@
 package com.example.delivery_service.controllers;
 
+import com.example.delivery_service.model.Entity.Address;
 import com.example.delivery_service.model.Entity.Order;
 import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.model.Enums.OrderState;
 import com.example.delivery_service.model.Enums.PickupType;
+import com.example.delivery_service.model.GoogleMapsApi;
 import com.example.delivery_service.model.MapsApiKeyReader;
 import com.example.delivery_service.services.OrderService;
+import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -27,13 +30,14 @@ public class DeliveryController {
 
     private final OrderService orderService;
     private final UserService userService;
+    private final StateService stateService;
     private static UserService staticUserService;
 
-    public DeliveryController(OrderService orderService, UserService userService) {
+    public DeliveryController(OrderService orderService, UserService userService, StateService stateService, StateService stateService1) {
         this.orderService = orderService;
         this.userService = userService;
+        this.stateService = stateService1;
     }
-
 
     @PostConstruct
     public void init(){
@@ -45,8 +49,20 @@ public class DeliveryController {
     @RequestMapping(value = "/delivery", method = RequestMethod.GET)
     public String orders(Model model, HttpServletRequest request) {
 
+        List<Order> orders = orderService.getOrdersByDriverId(User.getCurrentUser().getId());
+        String officceAddress = Address.getOfficeAddress(stateService).getFormatAddress();
+
+        try {
+            GoogleMapsApi api = new GoogleMapsApi();
+            orders = api.sortOrdersByShortestRoute(officceAddress, orders);
+        }
+        catch (Exception ex){
+            //TODO error
+        }
+
         model.addAttribute("apiKey", MapsApiKeyReader.readKey());
-        model.addAttribute("orders", orderService.getOrdersByUserId(User.getCurrentUser().getId()));
+        model.addAttribute("orders", orders);
+        model.addAttribute("officeAddress", officceAddress);
 
         return "delivery";
     }
@@ -113,7 +129,7 @@ public class DeliveryController {
                     //userService.saveOrUpdate(driver);
                     orderService.saveOrUpdate(order);
                 }
-                catch (IOException ex){
+                catch (Exception ex){
                     added = !added;
                 }
             }
@@ -136,26 +152,44 @@ public class DeliveryController {
             if(driver.getRoles().iterator().next().getName().equals("DRIVER")){
                 Order order = optOrder.get();
 
-                if(order.getDriver() != null && order.getDriver().getId().equals(driver.getId())) {
+                //WITH DRIVER
+                if(order.getDriver() != null) {
+                    if(order.getDriver().getId().equals(driver.getId())) {
 
-                    //drop at branch
-                    if (order.getPickupType() == PickupType.PICKUP && order.getState() == OrderState.WAITING_FOR_PACKAGE) {
-                        order.setState(OrderState.PROCESSING);
+                        //drop at branch by DRIVER
+                        if (order.getState() == OrderState.WAITING_FOR_PACKAGE) {
+                            order.setState(OrderState.PROCESSING);
+                            if(order.getPayment().getPayDate() == null)
+                                order.getPayment().setPayDate(new Date());
+                            order.setDriver(null);
+                        }
+                        //drop to recipient by DRIVER
+                        else if (order.getState() == OrderState.ON_ROAD) {
+                            order.setState(OrderState.DELIVERED);
+                        }
+
+                        try {
+                            orderService.saveOrUpdate(order);
+                        } catch (Exception ex) {
+                            id = -1L;
+                        }
+                    }
+                }
+                //drop at branch by USER
+                else if(order.getPickupType() == PickupType.DROP && order.getState() == OrderState.WAITING_FOR_PACKAGE) {
+
+                    order.setState(OrderState.PROCESSING);
+
+                    if(order.getPayment().getPayDate() == null)
                         order.getPayment().setPayDate(new Date());
-                        order.setDriver(null);
-                    }
-                    //drop to recipient
-                    else if (order.getState() == OrderState.PROCESSING) {
-                        order.setState(OrderState.DELIVERED);
-                    }
 
                     try {
                         orderService.saveOrUpdate(order);
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         id = -1L;
                     }
                 }
-                else {
+                else{
                     id = -1L;
                 }
             }
@@ -176,10 +210,4 @@ public class DeliveryController {
         return false;
     }
 
-    /*public static String getUserDriverAddress(){
-        User user = User.getCurrentUser(staticUserService);
-        if(user != null && user.getRoles().iterator().next().getName().equals("DRIVER") && user.getAddress() != null)
-            return user.getAddress().getFormatAddress(true);
-        return "";
-    }*/
 }

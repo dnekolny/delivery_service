@@ -24,22 +24,9 @@ public class LatLng
         this.lng = lng;
     }
 
-    public double getLat()
-    {
-        return lat;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public double getLng()
-    {
-        return lng;
-    }
-
-    public void setLng(double lng) {
-        this.lng = lng;
+    public LatLng(com.google.maps.model.LatLng gLL){
+        this.lat = gLL.lat;
+        this.lng = gLL.lng;
     }
 
     /**
@@ -59,5 +46,31 @@ public class LatLng
         {
             return null;
         }
+    }
+
+    public double getLat()
+    {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng()
+    {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

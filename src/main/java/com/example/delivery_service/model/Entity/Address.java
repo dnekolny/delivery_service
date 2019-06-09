@@ -1,7 +1,8 @@
 package com.example.delivery_service.model.Entity;
 
-import com.example.delivery_service.model.Geocoder;
+import com.example.delivery_service.model.GoogleMapsApi;
 import com.example.delivery_service.services.StateService;
+import com.google.maps.errors.ApiException;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -78,6 +79,10 @@ public class Address {
         setUpdateDate(new Date());
     }
 
+    public String getFormatAddress(){
+        return getFormatAddress(true);
+    }
+
     public String getFormatAddress(boolean withState){
         if(withState)
             //Valdštejnovo nám. 44, Staré Město, 506 01 Jičín, Česko
@@ -93,9 +98,15 @@ public class Address {
                 "Ve žlíbku 1800/77", "Praha 9","193 00");
     }
 
-    public void findLatLgt() throws IOException {
-        Geocoder geo = new Geocoder();
-        setLatLng(geo.geocode(getFormatAddress(true)));
+    public void findLatLng() throws ApiException, InterruptedException, IOException {
+        GoogleMapsApi api = new GoogleMapsApi();
+        LatLng newLL = api.geocode(getFormatAddress());
+        if(newLL != null) {
+            if (latLng == null)
+                latLng = new LatLng();
+            latLng.setLat(newLL.getLat());
+            latLng.setLng(newLL.getLng());
+        }
     }
 
     public Long getId() {

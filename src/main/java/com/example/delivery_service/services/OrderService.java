@@ -2,6 +2,7 @@ package com.example.delivery_service.services;
 
 import com.example.delivery_service.model.Entity.Order;
 import com.example.delivery_service.repository.OrderRepository;
+import com.google.maps.errors.ApiException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class OrderService {
         this.stateService = stateService;
     }
 
-    public void saveOrUpdate(Order order) throws IOException {
+    public void saveOrUpdate(Order order) throws ApiException, InterruptedException, IOException{
 
         Optional<Order> origOptOrder = Optional.empty();
 
@@ -70,13 +71,12 @@ public class OrderService {
             //order.setInBranch(false);
             order.setCreateAndUpdateDates(null);
             order.setId(ThreadLocalRandom.current().nextLong(1, Long.MAX_VALUE));
-        }
 
-        //geocoding
-        if(order.getRecipient().getAddress() != null)
-            order.getRecipient().getAddress().findLatLgt();
-        if(order.getCustomer().getAddress() != null)
-            order.getCustomer().getAddress().findLatLgt();
+            if(order.getCustomer() != null && order.getCustomer().getAddress() != null)
+                order.getCustomer().getAddress().findLatLng();
+            if(order.getRecipient() != null && order.getRecipient().getAddress() != null)
+                order.getRecipient().getAddress().findLatLng();
+        }
 
         repository.save(order);
     }
@@ -107,5 +107,9 @@ public class OrderService {
 
     public List<Order> getOrdersByUserId(Long userId) {
         return repository.getByUserId(userId);
+    }
+
+    public List<Order> getOrdersByDriverId(Long driverId) {
+        return repository.getByDriver_Id(driverId);
     }
 }

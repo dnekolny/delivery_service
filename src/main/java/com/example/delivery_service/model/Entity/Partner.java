@@ -1,7 +1,7 @@
 package com.example.delivery_service.model.Entity;
 
-import com.example.delivery_service.model.Geocoder;
 import com.example.delivery_service.services.StateService;
+import com.google.maps.errors.ApiException;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -70,7 +70,7 @@ public class Partner {
         }
     }
 
-    public void unite(Partner newPartner, StateService stateService){
+    public void unite(Partner newPartner, StateService stateService)  throws ApiException, InterruptedException, IOException {
         fullname = newPartner.fullname;
         email = newPartner.email;
         phoneNumber = newPartner.phoneNumber;
@@ -87,7 +87,7 @@ public class Partner {
                 address.setState(newPartner.address.getState());
                 address.fillStateFromShortcut(stateService);
             }
-
+            address.findLatLng();
         }
     }
 

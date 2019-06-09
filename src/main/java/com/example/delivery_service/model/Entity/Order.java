@@ -3,6 +3,7 @@ package com.example.delivery_service.model.Entity;
 import com.example.delivery_service.model.Enums.OrderState;
 import com.example.delivery_service.model.Enums.PickupType;
 import com.example.delivery_service.model.Enums.SizeCategory;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -54,6 +55,18 @@ public class Order {
         //this.aPackage = new Package();
         this.customer = new Partner();
         this.recipient = new Partner();
+    }
+
+    /**1 - balíček je připraven k doručení
+     * 0 - balíček se musí vyzvednout
+     * -1 - balíček nelze přepravit (nebyl předán uživatelem)*/
+    public int isReadyToDeliver(){
+        if (state == OrderState.ON_ROAD || state == OrderState.PROCESSING) {
+            return 1;
+        } else if (state == OrderState.WAITING_FOR_PACKAGE && pickupType == PickupType.PICKUP) {
+            return 0;
+        }
+        return -1;
     }
 
     public void setCreateAndUpdateDates(Order order){

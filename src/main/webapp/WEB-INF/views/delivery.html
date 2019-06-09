@@ -10,23 +10,134 @@
 <div id="container">
     <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-2">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2" th:text="#{orders}">Orders</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <a class="btn btn-sm btn-primary mr-2"
-                   th:href="'/order/new'">
-                    <span data-feather="plus"></span>
-                    <span th:text="#{new.order.name}">Create new order</span>
-                </a>
-            </div>
+            <h1 class="h2" th:text="#{delivery}">Delivery</h1>
         </div>
 
-        <div th:if="${addErrorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <span th:text="#{error.order.save.failed} + ': ' + ${addErrorMessage}" />
+        <div th:if="${errorMessage != null}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="#{error.something.is.wrong} + ': ' + ${errorMessage}" />
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
 
+        <div th:if="${not #lists.isEmpty(orders)}">
+
+            <div th:fragment="ordersCards(orders)">
+                <div class="row">
+
+                    <div class="col-md-6 col-lg-4 col-xl-3 p-0" th:each="order : ${orders}">
+                        <div class="card m-2">
+                            <div class="card-body pb-0">
+                                <h5 class="card-title mb-3 pb-3 border-bottom" th:text="${order.getDriveAddress().getFormatAddress()}">Card title</h5>
+                                <div class="card-text">
+                                    <p>
+                                        <span th:text="#{package.size.category} + ': '">Size category:</span>
+                                        <span class="font-weight-bold"  th:text="#{${order.sizeCategory.getResourceName()}}">Size category</span>
+                                    </p>
+                                    <p>
+                                        <span th:text="#{state.name} + ': '">Order state:</span>
+                                        <span class="font-weight-bold" th:text="#{${order.state.getResourceName()}}">State</span>
+                                    </p>
+                                    <p>
+                                        <span th:text="#{sender.name} + ': '">Sender:</span>
+                                        <span class="font-weight-bold" th:text="${order.customer.fullname}">Sender</span>
+                                    </p>
+                                    <p>
+                                        <span th:text="#{recipient.name} + ': '">Recipient:</span>
+                                        <span class="font-weight-bold" th:text="${order.recipient.fullname}">Recipient</span>
+                                    </p>
+                                    <p>
+                                        <span th:text="#{owner.name} + ': '">Owner:</span>
+                                        <span class="font-weight-bold" th:text="${order.user.fullname}">Owner</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="card-footer clearfix">
+                                <small class="text-muted float-right">
+                                    <button class="btn btn-sm btn-success btnDrop" th:attr="data-order-id=${order.id}"
+                                       th:if="${order.isReadyToDeliver() == 1}" th:text="#{delivered}">Delivery</button>
+                                    <button class="btn btn-sm btn-primary btnDrop" th:attr="data-order-id=${order.id}"
+                                       th:if="${order.isReadyToDeliver() == 0}" th:text="#{picked.up}">Pick up</button>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3 mt-2" style="height: 40em;">
+                <div id="map"></div>
+            </div>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+
+                function initWayMap() {
+                    var directionsService = new google.maps.DirectionsService;
+                    var directionsDisplay = new google.maps.DirectionsRenderer;
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 7,
+                        center: {lat: 49.743292, lng: 15.526285}
+                    });
+                    directionsDisplay.setMap(map);
+
+                    calculateAndDisplayOptimizeRoute(directionsService, directionsDisplay);
+                }
+
+                function calculateAndDisplayOptimizeRoute(directionsService, directionsDisplay) {
+                    var waypts = [];
+
+                    /*[# th:each="order : ${orders}"]*/
+                        waypts.push({
+                            location: /*[[${order.getDriveAddress().getFormatAddress()}]]*/ '',
+                            stopover: true
+                        });
+                    /*[/]*/
+
+                    var officeAddress = /*[[${officeAddress}]]*/ '';
+
+                    directionsService.route({
+                        origin: officeAddress,
+                        destination: officeAddress,
+                        waypoints: waypts,
+                        optimizeWaypoints: true,
+                        travelMode: 'DRIVING'
+                    }, function(response, status) {
+                        if (status === 'OK') {
+                            directionsDisplay.setDirections(response);
+                            var route = response.routes[0];
+                        } else {
+                            window.alert('Directions request failed due to ' + status);
+                        }
+                    });
+                }
+
+                $(document).ready(function () {
+                    $(".btnDrop").click(function () {
+                        var orderId = $(this).data("order-id");
+                        $.ajax({
+                            url: '/delivery/dropOrder',
+                            type: 'POST',
+                            data: { id: orderId }, //JSON.stringify(orderId)
+                            success: function (data) {
+                                console.log(data);
+                            },
+                            error: function (a, b, c) {
+                                console.log(a, b, c);
+                            }
+                        });
+                    });
+                });
+
+                /*]]>*/
+            </script>
+
+            <script async defer th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&callback=initWayMap'"></script>
+
+        </div>
+        <div th:unless="${not #lists.isEmpty(orders)}">
+            <p class="text-warning" th:text="#{no.selected.order.found}"></p>
+        </div>
 
     </main>
 </div>
