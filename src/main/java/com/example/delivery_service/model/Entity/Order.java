@@ -26,8 +26,6 @@ public class Order {
     @NotNull
     private PickupType pickupType;
 
-    //private boolean isInBranch;
-
     private OrderState state;
 
     @NotNull

@@ -1,5 +1,6 @@
 package com.example.delivery_service.config;
 
+import com.example.delivery_service.interceptor.Interceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -34,13 +35,15 @@ import java.util.Locale;
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private final ThymeleafProperties properties;
+    private final Interceptor interceptor;
 
     @Value("${spring.thymeleaf.templates_root:}")
     private String templatesRoot;
 
     @Autowired
-    public WebMvcConfiguration(ThymeleafProperties properties) {
+    public WebMvcConfiguration(ThymeleafProperties properties, Interceptor interceptor) {
         this.properties = properties;
+        this.interceptor = interceptor;
     }
 
     @Bean
@@ -81,6 +84,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(interceptor);
     }
 
 

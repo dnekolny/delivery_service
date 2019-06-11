@@ -81,7 +81,7 @@
                 </div>
             </div>
 
-            <div th:fragment="ordersList(orders, pageCount, pageNumber)">
+            <div th:fragment="ordersList(orders)">
                 <div class="table-responsive" th:if="${not #lists.isEmpty(orders)}">
                     <table class="table table-hover">
                         <tr>
@@ -144,25 +144,6 @@
                             </td>
                         </tr>
                     </table>
-
-                    <nav aria-label="Page navigation example" th:if="${pageCount > 1}">
-                        <ul class="pagination ml-2">
-                            <li class="page-item" th:classappend="${(pageNumber == 0) ? 'disabled' : ''}">
-                                <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${pageNumber - 1} + ');'" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                            <li class="page-item" th:each="i : ${#numbers.sequence(1, pageCount)}"
-                                th:classappend="${(i == pageNumber + 1) ? 'active' : ''}">
-                                <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${i - 1} + ');'" th:text="${i}">1</a>
-                            </li>
-                            <li class="page-item" th:classappend="${(pageNumber == (pageCount - 1)) ? 'disabled' : ''}">
-                                <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${pageNumber + 1} + ');'" aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
                 </div>
 
                 <div th:if="${#lists.isEmpty(orders)}">
@@ -245,6 +226,25 @@
                 <script async defer th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey} + '&callback=initMap'"></script>
 
             </div>
+
+            <nav aria-label="Page navigation example" th:if="${pageCount > 1}">
+                <ul class="pagination ml-2">
+                    <li class="page-item" th:classappend="${(pageNumber == 0) ? 'disabled' : ''}">
+                        <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${pageNumber - 1} + ');'" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(1, pageCount)}"
+                        th:classappend="${(i == pageNumber + 1) ? 'active' : ''}">
+                        <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${i - 1} + ');'" th:text="${i}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${(pageNumber == (pageCount - 1)) ? 'disabled' : ''}">
+                        <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${pageNumber + 1} + ');'" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
     </main>
     </div>

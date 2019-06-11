@@ -91,6 +91,10 @@ public class Address {
             return getStreet() + ", " + getZip() + " " + getCity();
     }
 
+    public String getShortAddress(){
+        return getStreet() + ", " + getCity();
+    }
+
     public static Address getOfficeAddress(StateService stateService){
         //Ve žlíbku 1800/77, 193 00 Praha 9 - Horní Počernice-Praha 20
         return new Address(null, null,

@@ -199,6 +199,101 @@
             </div>
         </div>
 
+        <!--DRIVER MAP-->
+        <div sec:authorize="hasRole('DRIVER')" th:fragment="orderDetailMap">
+
+            <div class="mb-3 mt-2" style="height: 40em;">
+                <div id="map"></div>
+            </div>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+
+                var locationLat = 0;
+                var locationLng = 0;
+
+                function showMap(position) {
+                    locationLat = position.coords.latitude;
+                    locationLng = position.coords.longitude;
+
+                    initWayMap();
+                }
+                function errorHandler(err) {
+                    if(err.code == 1) {
+                        console.log("Error: Access is denied!");
+                    } else if( err.code == 2) {
+                        console.log("Error: Position is unavailable!");
+                    }
+
+                    initWayMap();
+                }
+
+                $(document).ready(function () {
+                    if(navigator.geolocation){
+                        // timeout at 60000 milliseconds (60 seconds)
+                        var options = {timeout:60000};
+                        navigator.geolocation.getCurrentPosition
+                        (showMap, errorHandler, options);
+                    } else{
+                        console.log("Sorry, browser does not support geolocation!");
+                    }
+                });
+
+                function initWayMap() {
+                    var directionsService = new google.maps.DirectionsService;
+                    var directionsDisplay = new google.maps.DirectionsRenderer;
+                    var geocoder = new google.maps.Geocoder();
+
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 7,
+                        center: {lat: 49.743292, lng: 15.526285}
+                    });
+                    directionsDisplay.setMap(map);
+
+                    calculateAndDisplayOptimizeRoute(directionsService, directionsDisplay, geocoder, map);
+                }
+
+                function calculateAndDisplayOptimizeRoute(directionsService, directionsDisplay, geocoder, map) {
+
+                    var orderAddress = /*[[${order.getDriveFormatAddress()}]]*/ '';
+
+                    if(locationLng == 0 || locationLat == 0){
+                        geocoder.geocode({'address': orderAddress}, function(results, status) {
+                            if (status === 'OK') {
+                                map.setCenter(results[0].geometry.location);
+                                var marker = new google.maps.Marker({
+                                    position: results[0].geometry.location,
+                                    map: map,
+                                    title: orderAddress
+                                });
+                            } else {
+                                console.log('Geocode was not successful for the following reason: ' + status);
+                            }
+                        });
+                    }
+                    else {
+                        directionsService.route({
+                            origin: {lat: locationLat, lng: locationLng},
+                            destination: orderAddress,
+                            travelMode: 'DRIVING'
+                        }, function (response, status) {
+                            if (status === 'OK') {
+                                directionsDisplay.setDirections(response);
+                                var route = response.routes[0];
+                            } else {
+                                console.log('Directions request failed due to ' + status);
+                            }
+                        });
+                    }
+                }
+
+
+                /*]]>*/
+            </script>
+
+            <script async defer th:src="'https://maps.googleapis.com/maps/api/js?key=' + ${apiKey}"></script>
+        </div>
+
     </main>
 </div>
 

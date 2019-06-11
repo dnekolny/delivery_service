@@ -65,7 +65,7 @@ public class User extends Partner {
     }
 
     public static User getCurrentUser(){
-        return  getCurrentUser(null);
+        return getCurrentUser(null);
     }
 
     public static User getCurrentUser(UserService userService){

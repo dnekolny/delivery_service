@@ -29,7 +29,7 @@ import java.util.Date;
 @Controller
 public class OrderController {
 
-    private final int PAGE_SIZE = 3;
+    private final int PAGE_SIZE = 15;
 
     private final StateService stateService;
     private final OrderService orderService;
@@ -193,6 +193,7 @@ public class OrderController {
         if(order != null && (request.isUserInRole("ADMIN") || request.isUserInRole("DRIVER") ||
                 User.getCurrentUser().getId().equals(order.getUser().getId()))){
             model.addAttribute("order", order);
+            model.addAttribute("apiKey", MapsApiKeyReader.readKey());
 
             return "orderDetail";
         }

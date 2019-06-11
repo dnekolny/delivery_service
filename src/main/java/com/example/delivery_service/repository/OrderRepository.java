@@ -19,6 +19,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> getByDriver_IdAndStateNot(Long id, OrderState state);
 
+    Page<Order> getByDriver_IdAndStateNot(Long id, OrderState state, Pageable pageable);
+
     @Query(value = "select * from orders o " +
             "join partner u on u.id = o.user_id " +
             "join partner cu on cu.id = o.customer_id " +

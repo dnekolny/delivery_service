@@ -116,6 +116,10 @@ public class OrderService {
         return repository.getByDriver_IdAndStateNot(id, OrderState.DELIVERED);
     }
 
+    public Page<Order> getByDriverIdWithoutDelivered(Long id, Pageable pageable) {
+        return repository.getByDriver_IdAndStateNot(id, OrderState.DELIVERED, pageable);
+    }
+
     public List<Order> getOrdersAvailableToDeliver(Long id) {
         return repository.getOrdersAvailableToDeliver(id);
     }

@@ -73,8 +73,6 @@ public class DeliveryController {
     public String ordersMap(Model model, HttpServletRequest request) {
 
         model.addAttribute("apiKey", MapsApiKeyReader.readKey());
-        //model.addAttribute("orders", orderService.getAllOrders());
-        //model.addAttribute("orders", orderService.getOrdersWithoutDriver());
         model.addAttribute("orders", orderService.getOrdersAvailableToDeliver(User.getCurrentUser().getId()));
 
         return "ordersMap";
