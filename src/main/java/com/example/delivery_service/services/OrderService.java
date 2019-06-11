@@ -1,8 +1,11 @@
 package com.example.delivery_service.services;
 
 import com.example.delivery_service.model.Entity.Order;
+import com.example.delivery_service.model.Enums.OrderState;
 import com.example.delivery_service.repository.OrderRepository;
 import com.google.maps.errors.ApiException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -85,6 +88,21 @@ public class OrderService {
         return (List<Order>) repository.findAll();
     }
 
+    public Page<Order> getAllOrders(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public Page<Order> getAllFiltredOrders(String ownerName, String senderName, String recipientName, String isPayed, Long userId, Pageable pageable) {
+        ownerName = addPercentToString(ownerName);
+        senderName = addPercentToString(senderName);
+        recipientName = addPercentToString(recipientName);
+        return repository.getAllFiltredOrders(ownerName, senderName, recipientName, isPayed, userId, pageable);
+    }
+
+    public long getCount(){
+        return repository.count();
+    }
+
     public List<Order> getWithoutDriver() {
         return repository.getByDriverIsNull();
     }
@@ -93,8 +111,23 @@ public class OrderService {
         return repository.getByDriver_Id(id);
     }
 
-    public List<Order> getOrdersToDeliver(Long id) {
-        return repository.getOrdersToDeliver(id);
+    /**Objednávky které má řidič v seznamu a zatím nejsou doručené přijemci*/
+    public List<Order> getByDriverIdWithoutDelivered(Long id) {
+        return repository.getByDriver_IdAndStateNot(id, OrderState.DELIVERED);
+    }
+
+    public List<Order> getOrdersAvailableToDeliver(Long id) {
+        return repository.getOrdersAvailableToDeliver(id);
+    }
+
+    public Page<Order> getOrdersAvailableToDeliver(Long id, Pageable pageable) {
+        return repository.getOrdersAvailableToDeliver(id, pageable);
+    }
+
+    public Page<Order> getOrdersAvailableToDeliver(Long id, String senderName, String recipientName, String isPayed, Pageable pageable) {
+        senderName = addPercentToString(senderName);
+        recipientName = addPercentToString(recipientName);
+        return repository.getFiltredOrdersAvailableToDeliver(id, senderName, recipientName, isPayed, pageable);
     }
 
     public Optional<Order> getOrderById(Long id) {
@@ -105,11 +138,18 @@ public class OrderService {
         repository.deleteById(id);
     }
 
-    public List<Order> getOrdersByUserId(Long userId) {
-        return repository.getByUserId(userId);
+    public Page<Order> getFiltredOrdersByUserId(Long userId, Pageable pageable) {
+        return repository.getByUserId(userId, pageable);
     }
 
-    public List<Order> getOrdersByDriverId(Long driverId) {
-        return repository.getByDriver_Id(driverId);
+    public Page<Order> getFiltredOrdersByUserId(String ownerName, String senderName, String recipientName, String isPayed, Long userId, Pageable pageable) {
+        return getAllFiltredOrders(ownerName, senderName, recipientName, isPayed, userId, pageable);
+    }
+
+    private String addPercentToString(String val){
+        if(!val.isEmpty())
+            val = '%' + val + '%';
+
+        return val;
     }
 }

@@ -10,6 +10,7 @@ import com.example.delivery_service.model.MapsApiKeyReader;
 import com.example.delivery_service.services.OrderService;
 import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
+import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class DeliveryController {
     @RequestMapping(value = "/delivery", method = RequestMethod.GET)
     public String orders(Model model, HttpServletRequest request) {
 
-        List<Order> orders = orderService.getOrdersByDriverId(User.getCurrentUser().getId());
+        List<Order> orders = orderService.getByDriverIdWithoutDelivered(User.getCurrentUser().getId());
         String officceAddress = Address.getOfficeAddress(stateService).getFormatAddress();
 
         try {
@@ -75,7 +75,7 @@ public class DeliveryController {
         model.addAttribute("apiKey", MapsApiKeyReader.readKey());
         //model.addAttribute("orders", orderService.getAllOrders());
         //model.addAttribute("orders", orderService.getOrdersWithoutDriver());
-        model.addAttribute("orders", orderService.getOrdersToDeliver(User.getCurrentUser().getId()));
+        model.addAttribute("orders", orderService.getOrdersAvailableToDeliver(User.getCurrentUser().getId()));
 
         return "ordersMap";
     }
@@ -141,14 +141,17 @@ public class DeliveryController {
     /**DROP ORDER*/
     @PreAuthorize("hasAnyRole('DRIVER')")
     @RequestMapping(value = "/delivery/dropOrder", method = RequestMethod.POST)
-    public @ResponseBody String dropOrder(Long id) {
+    public @ResponseBody Pair<String, Boolean> dropOrder(Long id) {
 
         Optional<Order> optOrder = orderService.getOrderById(id);
         Optional<User> optUser = userService.getUserById(User.getCurrentUser().getId());
 
+        boolean isDelivered = false;
+
         if(optUser.isPresent() && optOrder.isPresent()){
             User driver = optUser.get();
 
+            //TODO předěldělat - user nemusí být jenom DRIVER
             if(driver.getRoles().iterator().next().getName().equals("DRIVER")){
                 Order order = optOrder.get();
 
@@ -166,6 +169,7 @@ public class DeliveryController {
                         //drop to recipient by DRIVER
                         else if (order.getState() == OrderState.ON_ROAD) {
                             order.setState(OrderState.DELIVERED);
+                            isDelivered = true;
                         }
 
                         try {
@@ -195,7 +199,7 @@ public class DeliveryController {
             }
         }
 
-        return String.valueOf(id);
+        return new Pair<>(String.valueOf(id), isDelivered);
     }
 
     public static boolean deliveryOrdersContains(Long id){

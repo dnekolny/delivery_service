@@ -54,9 +54,9 @@
                             </div>
                             <div class="card-footer clearfix">
                                 <small class="text-muted float-right">
-                                    <button class="btn btn-sm btn-success btnDrop" th:attr="data-order-id=${order.id}"
+                                    <button class="btn btn-sm btn-success btnDrop" th:id="'btnDrop_' + ${order.id}" th:attr="data-order-id=${order.id}"
                                        th:if="${order.isReadyToDeliver() == 1}" th:text="#{delivered}">Delivery</button>
-                                    <button class="btn btn-sm btn-primary btnDrop" th:attr="data-order-id=${order.id}"
+                                    <button class="btn btn-sm btn-primary btnDrop" th:id="'btnDrop_' + ${order.id}" th:attr="data-order-id=${order.id}"
                                        th:if="${order.isReadyToDeliver() == 0}" th:text="#{picked.up}">Pick up</button>
                                 </small>
                             </div>
@@ -120,6 +120,14 @@
                             type: 'POST',
                             data: { id: orderId }, //JSON.stringify(orderId)
                             success: function (data) {
+                                var name = '#btnDrop_' + data.value0;
+                                var btn = $(name);
+
+                                btn.removeClass('btn-success');
+                                btn.removeClass('btn-primary');
+                                btn.addClass('btn-outline-success');
+                                btn.attr("disabled", true);
+
                                 console.log(data);
                             },
                             error: function (a, b, c) {

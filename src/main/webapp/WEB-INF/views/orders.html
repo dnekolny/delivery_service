@@ -27,7 +27,61 @@
                 </button>
             </div>
 
-            <div th:fragment="ordersList(orders)">
+            <div class="card mb-2">
+                <div class="card-header p-2 pl-3 pr-3" th:text="#{filter}">
+                    Filter
+                </div>
+                <div class="card-body clearfix pt-2 pl-3 pr-3 pb-2">
+                    <form method="get" id="filterForm" th:action="@{/orders/filter}">
+                        <div class="row">
+                            <input hidden id="filterPageNumber" name="page" th:value="${(param.page == null) ? 0 : param.page}">
+                            <!--OWNER NAME-->
+                            <div class="form-group col-sm-6 col-lg-4 col-xl-2" sec:authorize="hasRole('ADMIN')">
+                                <label for="ownerName" th:text="#{owner.fullname}">Owner name</label>
+                                <input id="ownerName" name="ownerName" type="text" th:value="${param.ownerName}" class="form-control form-control-sm">
+                            </div>
+                            <!--SENDER NAME-->
+                            <div class="form-group col-sm-6 col-lg-4 col-xl-2">
+                                <label for="senderName" th:text="#{sender.fullname}">Sender name</label>
+                                <input id="senderName" name="senderName" type="text" th:value="${param.senderName}" class="form-control form-control-sm">
+                            </div>
+                            <!--RECIPIENT NAME-->
+                            <div class="form-group col-sm-6 col-lg-4 col-xl-2">
+                                <label for="recipientName" th:text="#{recipient.fullname}">Recipient name</label>
+                                <input id="recipientName" name="recipientName" type="text" th:value="${param.recipientName}" class="form-control form-control-sm">
+                            </div>
+                            <!--PAYED-->
+                            <div class="form-group col-sm-6 col-lg-4 col-xl-2">
+                                <label for="isPayed" th:text="#{is.payed}">Is payed:</label>
+                                <select id="isPayed" name="isPayed" class="form-control form-control-sm">
+                                    <option value="" th:selected="${(param.isPayed != null) && (param.isPayed[0] == '')}">--</option>
+                                    <option value="true" th:selected="${(param.isPayed != null) && (param.isPayed[0] == 'true')}">Payed</option>
+                                    <option value="false" th:selected="${(param.isPayed != null) && (param.isPayed[0] == 'false')}">Not payed</option>
+                                </select>
+                            </div>
+                            <!--ORDER BY-->
+                            <div class="form-group col-sm-6 col-lg-4 col-xl-2">
+                                <label for="orderBy" th:text="#{order.by}">Order by:</label>
+                                <select id="orderBy" name="orderBy" class="form-control form-control-sm">
+                                    <option value="createDate"
+                                            th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'createDate')}">Create date</option>
+                                    <option sec:authorize="!hasRole('DRIVER')" value="state"
+                                            th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'state')}">Order state</option>
+                                    <option sec:authorize="hasRole('ADMIN')" value="u.fullname"
+                                            th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'u.fullname')}">Owner name</option>
+                                    <option value="cu.fullname"
+                                            th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'cu.fullname')}">Sender name</option>
+                                    <option value="r.fullname"
+                                            th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'r.fullname')}">Recipient name</option>
+                                </select>
+                            </div>
+                            <button type="submit" onclick="$('#filterPageNumber').val(0);" class="btn btn-sm btn-warning col-sm-3 col-lg-2 col-xl-1 pr-4 pl-4 mr-2 ml-2 ml-sm-auto mt-auto" th:text="#{filter}">Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div th:fragment="ordersList(orders, pageCount, pageNumber)">
                 <div class="table-responsive" th:if="${not #lists.isEmpty(orders)}">
                     <table class="table table-hover">
                         <tr>
@@ -90,6 +144,25 @@
                             </td>
                         </tr>
                     </table>
+
+                    <nav aria-label="Page navigation example" th:if="${pageCount > 1}">
+                        <ul class="pagination ml-2">
+                            <li class="page-item" th:classappend="${(pageNumber == 0) ? 'disabled' : ''}">
+                                <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${pageNumber - 1} + ');'" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(1, pageCount)}"
+                                th:classappend="${(i == pageNumber + 1) ? 'active' : ''}">
+                                <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${i - 1} + ');'" th:text="${i}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${(pageNumber == (pageCount - 1)) ? 'disabled' : ''}">
+                                <a class="page-link" href="#" th:onclick="'redirectToPage(' + ${pageNumber + 1} + ');'" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
 
                 <div th:if="${#lists.isEmpty(orders)}">
@@ -112,6 +185,13 @@
                     </div>
                 </div>
 
+                <script>
+                    function redirectToPage(pageNumber){
+                        $('#filterPageNumber').val(pageNumber);
+                        $('form#filterForm').submit();
+                    }
+                </script>
+
                 <script sec:authorize="hasRole('DRIVER')" th:inline="javascript">
                     /*<![CDATA[*/
 
@@ -119,9 +199,9 @@
                         $(".btnTruck").click(function () {
                             var orderId = $(this).data("order-id");
                             $.ajax({
-                                url: '/delivery/addOrderToDeliverList',
+                                url: /*[[@{/delivery/addOrderToDeliverList}]]*/ '',
                                 type: 'POST',
-                                data: { id: orderId }, //JSON.stringify(orderId)
+                                data: { id: orderId,  markerId: 0 }, //JSON.stringify(orderId)
                                 success: function (data) {
                                     var name = '#btnTruck_' + data.value0;
                                     var btn = $(name);
@@ -157,7 +237,7 @@
 
                     $('#map-modal').on('hidden.bs.modal', function () {
                         directionsDisplay.setDirections({routes: []});
-                    })
+                    });
 
                     /*]]>*/
                 </script>

@@ -10,14 +10,15 @@ import com.example.delivery_service.model.MapsApiKeyReader;
 import com.example.delivery_service.services.OrderService;
 import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,8 @@ import java.util.Date;
 
 @Controller
 public class OrderController {
+
+    private final int PAGE_SIZE = 3;
 
     private final StateService stateService;
     private final OrderService orderService;
@@ -42,23 +45,69 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
     public String orders(Model model, HttpServletRequest request) {
+
+        Page<Order> orderPage;
+        Pageable pageable = PageRequest.of(0, PAGE_SIZE, Sort.by("createDate"));
+
         if(request.isUserInRole("ADMIN")){
             model.addAttribute("apiKey", MapsApiKeyReader.readKey());
             model.addAttribute("officeAddress", Address.getOfficeAddress(stateService).getFormatAddress(true));
-            model.addAttribute("orders", orderService.getAllOrders());
+            //model.addAttribute("orders", orderService.getAllOrders());
+            orderPage = orderService.getAllOrders(pageable);
         }
         else if(request.isUserInRole("DRIVER")){
             model.addAttribute("apiKey", MapsApiKeyReader.readKey());
             model.addAttribute("officeAddress", Address.getOfficeAddress(stateService).getFormatAddress(true));
-            model.addAttribute("orders", orderService.getOrdersToDeliver(User.getCurrentUser().getId()));
+            orderPage = orderService.getOrdersAvailableToDeliver(User.getCurrentUser().getId(), pageable);
         }
         else{
-            model.addAttribute("orders", orderService.getOrdersByUserId(User.getCurrentUser().getId()));
+            orderPage = orderService.getFiltredOrdersByUserId(User.getCurrentUser().getId(), pageable);
         }
+
+        model.addAttribute("pageNumber", 0);
+        model.addAttribute("pageCount", orderPage.getTotalPages());
+        model.addAttribute("orders", orderPage.getContent());
 
         return "orders";
     }
 
+    /**LIST - Paging*/
+    @PreAuthorize("isAuthenticated()")
+    @RequestMapping(value = "/orders/filter", method = RequestMethod.GET)
+    public String orders(@RequestParam int page,
+                         @RequestParam(required = false) String ownerName,
+                         @RequestParam(required = false) String senderName,
+                         @RequestParam(required = false) String recipientName,
+                         @RequestParam(required = false) String isPayed,
+                         @RequestParam(required = false) String orderBy,
+                         Model model,
+                         HttpServletRequest request) {
+
+        Page<Order> orderPage;
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(orderBy));
+
+        if(request.isUserInRole("ADMIN")){
+            model.addAttribute("apiKey", MapsApiKeyReader.readKey());
+            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService).getFormatAddress(true));
+            //model.addAttribute("orders", orderService.getAllOrders());
+            orderPage = orderService.getAllFiltredOrders(ownerName, senderName, recipientName, isPayed,null, pageable);
+
+        }
+        else if(request.isUserInRole("DRIVER")){
+            model.addAttribute("apiKey", MapsApiKeyReader.readKey());
+            model.addAttribute("officeAddress", Address.getOfficeAddress(stateService).getFormatAddress(true));
+            orderPage = orderService.getOrdersAvailableToDeliver(User.getCurrentUser().getId(), senderName, recipientName, isPayed, pageable);
+        }
+        else{
+            orderPage = orderService.getFiltredOrdersByUserId("", senderName, recipientName, isPayed, User.getCurrentUser().getId(), pageable);
+        }
+
+        model.addAttribute("pageNumber", page);
+        model.addAttribute("pageCount", orderPage.getTotalPages());
+        model.addAttribute("orders", orderPage.getContent());
+
+        return "orders";
+    }
 
     /**NEW*/
     @PreAuthorize("isAuthenticated()")
@@ -195,4 +244,7 @@ public class OrderController {
         this.orderService.removeOrder(id);
         return "redirect:/orders";
     }
+
+
+
 }

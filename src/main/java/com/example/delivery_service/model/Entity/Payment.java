@@ -16,6 +16,7 @@ public class Payment {
 
     private Date updateDate;
 
+    @Column(name = "payDate")
     private Date payDate;
 
     private double price;
