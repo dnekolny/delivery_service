@@ -63,15 +63,15 @@
                             <div class="form-group col-sm-6 col-lg-4 col-xl-2">
                                 <label for="orderBy" th:text="#{order.by}">Order by:</label>
                                 <select id="orderBy" name="orderBy" class="form-control form-control-sm">
-                                    <option value="createDate"
+                                    <option value="createDate" th:text="#{create.date.name}"
                                             th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'createDate')}">Create date</option>
-                                    <option sec:authorize="!hasRole('DRIVER')" value="state"
+                                    <option sec:authorize="!hasRole('DRIVER')" value="state" th:text="#{order.state.name}"
                                             th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'state')}">Order state</option>
-                                    <option sec:authorize="hasRole('ADMIN')" value="u.fullname"
+                                    <option sec:authorize="hasRole('ADMIN')" value="u.fullname" th:text="#{owner.fullname}"
                                             th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'u.fullname')}">Owner name</option>
-                                    <option value="cu.fullname"
+                                    <option value="cu.fullname" th:text="#{sender.fullname}"
                                             th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'cu.fullname')}">Sender name</option>
-                                    <option value="r.fullname"
+                                    <option value="r.fullname" th:text="#{recipient.fullname}"
                                             th:selected="${(param.orderBy != null) && (param.orderBy[0] == 'r.fullname')}">Recipient name</option>
                                 </select>
                             </div>
@@ -102,9 +102,11 @@
                             <td sec:authorize="hasRole('ADMIN')" th:text="${order.user.fullname}" class="clickable-cell" style="cursor: pointer;"
                                 th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
 
-                            <div sec:authorize="hasRole('DRIVER')" th:switch="${order.isReadyToDeliver()}" class="clickable-cell" style="cursor: pointer;">
-                                <td th:case="1" th:text="#{delivery}" class="text-success" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
-                                <td th:case="0" th:text="#{pick.up}" class="text-primary" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                            <div sec:authorize="hasRole('DRIVER')" th:switch="${order.isReadyToDeliver()}">
+                                <td th:case="1" th:text="#{delivery}" class="text-success clickable-cell" style="cursor: pointer;"
+                                    th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
+                                <td th:case="0" th:text="#{pick.up}" class="text-primary clickable-cell" style="cursor: pointer;"
+                                    th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
                                 <td th:case="*" th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
                             </div>
 
@@ -126,7 +128,7 @@
                                 th:attr="data-href=@{/order/detail/} + ${order.id}"></td>
 
                             <td sec:authorize="hasRole('ADMIN') || hasRole('DRIVER')">
-                                <a th:href="@{/order/edit/} + ${order.id}" class="text-primary mr-1">
+                                <a sec:authorize="hasRole('ADMIN')" th:href="@{/order/edit/} + ${order.id}" class="text-primary mr-1">
                                     <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
 
                                 <a sec:authorize="hasRole('DRIVER')" class="btnMap text-warning mr-1"

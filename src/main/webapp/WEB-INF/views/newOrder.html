@@ -81,7 +81,7 @@
 
                                 <input type="radio" th:id="${pickType.name()}" class="form-check-input" th:value="${pickType.name()}" th:field="*{pickupType}"
                                        th:classappend="${#fields.hasErrors('pickupType')} ? 'is-invalid'" required/>
-                                <label class="form-check-label" th:for="${pickType.name()}" th:text="${pickType.toString()}">Pickup Types</label>
+                                <label class="form-check-label" th:for="${pickType.name()}" th:text="#{${pickType.getResourceName()}}">Pickup Types</label>
                                 <span class="font-weight-bold" th:text="${' (' + pickType.getPrice() + ' Kč)'}">cena</span>
                                 <span th:if="${pickType.name() == 'PICKUP'}" class="text-danger invalid-feedback"
                                       th:text="#{radio.check.required.message}">způsob předání je povinné pole

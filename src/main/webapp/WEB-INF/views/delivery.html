@@ -53,10 +53,13 @@
                                 </div>
                             </div>
                             <div class="card-footer clearfix">
-                                <small class="text-muted float-right">
-                                    <button class="btn btn-sm btn-success btnDrop" th:id="'btnDrop_' + ${order.id}" th:attr="data-order-id=${order.id}"
+                                <small class="text-muted">
+                                    <a class="btn btn-sm btn-outline-primary float-left"
+                                            th:text="#{order.detail}" th:href="@{/order/detail/} + ${order.id}">Order detail</a>
+
+                                    <button type="button" class="btn btn-sm btn-success btnDrop float-right" th:id="'btnDrop_' + ${order.id}" th:attr="data-order-id=${order.id}"
                                        th:if="${order.isReadyToDeliver() == 1}" th:text="#{delivered}">Delivery</button>
-                                    <button class="btn btn-sm btn-primary btnDrop" th:id="'btnDrop_' + ${order.id}" th:attr="data-order-id=${order.id}"
+                                    <button type="button" class="btn btn-sm btn-primary btnDrop float-right" th:id="'btnDrop_' + ${order.id}" th:attr="data-order-id=${order.id}"
                                        th:if="${order.isReadyToDeliver() == 0}" th:text="#{picked.up}">Pick up</button>
                                 </small>
                             </div>
@@ -107,7 +110,7 @@
                             directionsDisplay.setDirections(response);
                             var route = response.routes[0];
                         } else {
-                            window.alert('Directions request failed due to ' + status);
+                            console.log('Directions request failed due to ' + status);
                         }
                     });
                 }
