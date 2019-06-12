@@ -1,0 +1,10 @@
+version: '2'
+services:
+  app:
+    #pro vyvoj
+    volumes:
+    - .:/app
+    #pro vyvoj
+    entrypoint: ./mvnw spring-boot:run
+
+#verzovaný gitem
