@@ -44,7 +44,7 @@ public class DeliveryController {
         DeliveryController.staticUserService = userService;
     }
 
-    /**LIST*/
+    /**DELIVERY*/
     @PreAuthorize("hasAnyRole('DRIVER')")
     @RequestMapping(value = "/delivery", method = RequestMethod.GET)
     public String orders(Model model, HttpServletRequest request) {

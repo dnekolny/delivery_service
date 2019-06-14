@@ -3,6 +3,7 @@ package com.example.delivery_service.interceptor;
 import com.example.delivery_service.model.Entity.Address;
 import com.example.delivery_service.model.Entity.Order;
 import com.example.delivery_service.model.Entity.User;
+import com.example.delivery_service.model.Enums.OrderState;
 import com.example.delivery_service.model.GoogleMapsApi;
 import com.example.delivery_service.services.OrderService;
 import com.example.delivery_service.services.StateService;
@@ -44,7 +45,7 @@ public class Interceptor implements HandlerInterceptor {
             Page<Order> ordersPage;
 
             if(user.getRoles().iterator().next().getName().equals("ADMIN")){
-                ordersPage = orderService.getAllOrders(PageRequest.of(0, PAGE_SIZE, Sort.by("createDate")));
+                ordersPage = orderService.getOrdersByStateNot(OrderState.DELIVERED ,PageRequest.of(0, PAGE_SIZE, Sort.by("createDate")));
                 modelAndView.getModel().put("navOrders", ordersPage.getContent());
             }
             else if(user.getRoles().iterator().next().getName().equals("DRIVER")){

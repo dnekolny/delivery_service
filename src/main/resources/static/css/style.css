@@ -18,7 +18,13 @@ header.masthead {
     background: url('/img/truck_01.jpg') no-repeat center center;
     background-size: cover;
     padding-top: 8rem;
-    padding-bottom: 8rem
+    padding-bottom: 8rem;
+}
+
+header.masthead-sm {
+    background: url('/img/truck_sm_01.jpg') no-repeat center center;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
 }
 
 header.masthead .overlay {
@@ -39,6 +45,11 @@ header.masthead h1 {
     header.masthead {
         padding-top: 12rem;
         padding-bottom: 12rem
+    }
+
+    header.masthead-sm{
+        padding-top: 3rem;
+        padding-bottom: 3rem
     }
 
     header.masthead h1 {

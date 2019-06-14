@@ -26,7 +26,7 @@
                             <th scope="col">Create Date</th>
                             <th scope="col">Actions</th>
                         </tr>
-                        <tr th:each="user : ${users}">
+                        <tr th:each="user : ${users}" th:classappend="${!user.isActive()} ? 'table-warning' ">
                             <td th:text="${user.id}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
                             <td th:text="${user.fullname}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
                             <td th:text="${user.roles[0].name}" class="clickable-cell" style="cursor: pointer;" th:attr="data-href=@{/user/detail/} + ${user.id} + '?prof=false'"></td>
@@ -36,8 +36,13 @@
                             <td>
                                 <a th:href="@{/user/edit/} + ${user.id} + '?prof=false'" class="text-primary">
                                     <span style="width: 20px; height: 20px" data-feather="edit-2"></span></a>
-                                <a th:href="@{/user/delete/} + ${user.id}" class="ml-1 text-danger" th:onclick="'return confirm(\'' + #{confirm.delete.user(${user.id})} + '\')'">
-                                    <span style="width: 20px; height: 20px" data-feather="trash-2"></span></a>
+                                <a th:if="${user.isActive()}" th:href="@{/user/delete/} + ${user.id}" class="ml-1"
+                                   th:onclick="'return confirm(\'' + #{confirm.delete.user(${user.id})} + '\')'">
+                                    <span class="text-danger" style="width: 20px; height: 20px" data-feather="trash-2" ></span>
+                                </a>
+                                <a th:if="${!user.isActive()}" th:href="@{/user/delete/} + ${user.id}" class="ml-1">
+                                    <span class="text-success" style="width: 20px; height: 20px" data-feather="user-check" ></span>
+                                </a>
                             </td>
                         </tr>
                     </table>

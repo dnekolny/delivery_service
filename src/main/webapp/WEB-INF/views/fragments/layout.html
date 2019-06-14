@@ -22,7 +22,7 @@
 <body>
 <header th:fragment="header(pageName)">
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-3 col-lg-2 mr-0" href="#">
+        <a class="navbar-brand col-md-3 col-lg-2 mr-0" href="/">
             <img alt="icon" class="img-fluid mr-2" style="width: 30px;" src="/img/icon.png">
             Delivery Service
         </a>
@@ -88,7 +88,8 @@
                         <li class="nav-item">
                             <a class="nav-link" th:href="@{/order/detail/} + ${order.id}">
                                 <span data-feather="file-text"></span>
-                                <span th:text="${order.recipient.address.getShortAddress()}"></span>
+                                <span sec:authorize="hasRole('CUSTOMERS') || hasRole('ADMIN')" th:text="${order.recipient.address.getShortAddress()}"></span>
+                                <span sec:authorize="hasRole('DRIVER')" th:text="${order.getDriveAddress().getShortAddress()}"></span>
                             </a>
                         </li>
                     </ul>

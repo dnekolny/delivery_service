@@ -92,6 +92,10 @@ public class OrderService {
         return repository.findAll(pageable);
     }
 
+    public Page<Order> getOrdersByStateNot(OrderState state, Pageable pageable) {
+        return repository.getByStateNot(state, pageable);
+    }
+
     public Page<Order> getAllFiltredOrders(String ownerName, String senderName, String recipientName, String isPayed, Long userId, Pageable pageable) {
         ownerName = addPercentToString(ownerName);
         senderName = addPercentToString(senderName);
@@ -151,7 +155,7 @@ public class OrderService {
     }
 
     private String addPercentToString(String val){
-        if(!val.isEmpty())
+        if(val != null && !val.isEmpty())
             val = '%' + val + '%';
 
         return val;

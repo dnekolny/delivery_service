@@ -17,6 +17,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> getByDriver_Id(Long id);
 
+    Page<Order> getByStateNot(OrderState state, Pageable pageable);
+
     List<Order> getByDriver_IdAndStateNot(Long id, OrderState state);
 
     Page<Order> getByDriver_IdAndStateNot(Long id, OrderState state, Pageable pageable);

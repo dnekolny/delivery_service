@@ -43,7 +43,7 @@
         </div>
 
         <!--ORDER STATE-->
-        <div class="card mb-2">
+        <div class="card mb-2" th:fragment="orderState(order)">
             <div class="card-header" th:text="#{state.name}">
                 Order state
             </div>
@@ -93,7 +93,7 @@
         </div>
 
         <div th:fragment="orderSum(order)">
-            <div class="row">
+            <div class="row" th:fragment="customerAndRecipient(order)">
                 <!--CUSTOMER-->
                 <div class="col-md-6">
                     <div class="card mb-2">
@@ -130,7 +130,7 @@
                 </div>
             </div>
             <!--PACKAGE-->
-            <div class="row">
+            <div class="row" th:fragment="package(order)">
                 <div class="col-md-6">
                     <div class="card mb-2">
                         <div class="card-header" th:text="#{package.name}">
@@ -140,11 +140,11 @@
 
                             <p>
                                 <span th:text="#{package.size.category} + ': '"></span>
-                                <span class="font-weight-bold" th:text="${order.sizeCategory}"></span>
+                                <span class="font-weight-bold" th:text="#{${order.sizeCategory.getResourceName()}}"></span>
                             </p>
                             <p>
                                 <span th:text="#{pickup.type.name} + ': '"></span>
-                                <span class="font-weight-bold" th:text="${order.pickupType}"></span>
+                                <span class="font-weight-bold" th:text="#{${order.pickupType.getResourceName()}}"></span>
                             </p>
                         </div>
                     </div>
@@ -180,12 +180,12 @@
                         <tbody>
                         <tr>
                             <td th:text="#{package.size.category}">Size category</td>
-                            <td th:text="${order.sizeCategory}">0</td>
+                            <td th:text="#{${order.sizeCategory.getResourceName()}}">0</td>
                             <td th:text="${order.sizeCategory.getPrice()} + ' Kč'">0</td>
                         </tr>
                         <tr>
                             <td th:text="#{pickup.type.name}">Pickup Type</td>
-                            <td th:text="${order.pickupType}">0</td>
+                            <td th:text="#{${order.pickupType.getResourceName()}}">0</td>
                             <td th:text="${order.pickupType.getPrice()} + ' Kč'">0</td>
                         </tr>
                         <tr class="table-info">

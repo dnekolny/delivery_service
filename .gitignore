@@ -1,6 +1,8 @@
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 
+docker-compose.override.yml
+
 application.properties
 
 ### STS ###

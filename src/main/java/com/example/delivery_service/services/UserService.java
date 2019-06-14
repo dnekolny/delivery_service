@@ -41,7 +41,7 @@ public class UserService {
             user.setOrders(origUser.getOrders());
 
             //PASSWORD
-            if(user.getPassword().isEmpty())
+            if(user.getPassword() != null && user.getPassword().isEmpty())
                 user.setPassword(origUser.getPassword());
 
             //ROLES
@@ -64,6 +64,7 @@ public class UserService {
         }
         /**NEW*/
         else{
+            user.setActive(true);
             user.setCreateAndUpdateDates(null);
             user.setRoles(new HashSet<>(Collections.singletonList(roleService.getDefaultRole().orElse(null))));
         }
@@ -89,8 +90,12 @@ public class UserService {
         return getUserById(id, false);
     }
 
-    public void removeUser(Long id) {
-        repository.deleteById(id);
+    public void removeUser(Long id) throws ApiException, InterruptedException, IOException {
+        User user = getUserById(id).orElse(null);
+        if(user != null){
+            user.setActive(!user.isActive());
+            saveOrUpdate(user);
+        }
     }
 
     public List<User> getByFullname(String surname) {

@@ -25,6 +25,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
+        if(optionalUser.isPresent() && !optionalUser.get().isActive()){
+            throw new UsernameNotFoundException("User access denied!");
+        }
+
         optionalUser.orElseThrow(() -> new UsernameNotFoundException("Username not found!!!"));
 
         return optionalUser.map(UserDetailsImpl::new).get();

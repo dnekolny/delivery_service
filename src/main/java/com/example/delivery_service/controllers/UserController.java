@@ -236,7 +236,12 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     @RequestMapping(value = "/user/delete/{id}", method = RequestMethod.GET)
     public String removeUser(@PathVariable("id") Long id){
-        this.userService.removeUser(id);
+        try {
+            this.userService.removeUser(id);
+        }
+        catch (Exception ex){
+
+        }
         return "redirect:/users";
     }
 }

@@ -28,13 +28,15 @@ public class User extends Partner {
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER, cascade={CascadeType.MERGE,CascadeType.REFRESH})
     private Set<Role> roles;
 
-    @OneToMany(targetEntity = Order.class, mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL) //pokud smažu uživatele smaže to i všechny jeho objednávky
-    //@Cascade(org.hibernate.annotations.CascadeType.DELETE)
+    @OneToMany(targetEntity = Order.class, mappedBy = "user", fetch = FetchType.EAGER)//, cascade = CascadeType.ALL) //pokud smažu uživatele smaže to i všechny jeho objednávky
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE)
     private List<Order> orders;
 
     @OneToMany(targetEntity = Order.class, mappedBy = "driver", cascade=CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<Order> deliveryOrders;
+
+    private boolean isActive;
 
     public User() {
         super();
@@ -116,5 +118,13 @@ public class User extends Partner {
 
     public void setDeliveryOrders(List<Order> deliveryOrders) {
         this.deliveryOrders = deliveryOrders;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

@@ -7,6 +7,7 @@ import com.example.delivery_service.model.Entity.Payment;
 import com.example.delivery_service.model.Entity.User;
 import com.example.delivery_service.model.Enums.PayMethod;
 import com.example.delivery_service.model.MapsApiKeyReader;
+import com.example.delivery_service.services.EmailService;
 import com.example.delivery_service.services.OrderService;
 import com.example.delivery_service.services.StateService;
 import com.example.delivery_service.services.UserService;
@@ -34,11 +35,13 @@ public class OrderController {
     private final StateService stateService;
     private final OrderService orderService;
     private final UserService userService;
+    private final EmailService emailService;
 
-    public OrderController(StateService stateService, OrderService orderService, UserService userService) {
+    public OrderController(StateService stateService, OrderService orderService, UserService userService, EmailService emailService) {
         this.stateService = stateService;
         this.orderService = orderService;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     /**LIST*/
@@ -209,6 +212,9 @@ public class OrderController {
                             Model model){
 
         Order order = orderService.getOrderById(id).orElse(null);
+
+        //TODO smazat
+        emailService.sendNewOrderMail("Hello David", order);
 
         model.addAttribute("states", stateService.getAllStates());
         model.addAttribute("order", order);
