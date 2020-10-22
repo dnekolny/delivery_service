@@ -187,6 +187,7 @@ public class UserController {
                         if (newPassword.isEmpty()) {
                             user.setPassword(origUser.getPassword());
                         } else
+                        {
                             user.setPassword(passwordEncoder.encode(newPassword));
                         }
 
@@ -219,12 +220,13 @@ public class UserController {
                         model.addAttribute("passwordErrorMessage", message);
                         return "userEdit";
                     }
-                /*} else {
+                }
+                else {
                     model.addAttribute("user", user);
                     String message = messageSource.getMessage("error.something.is.wrong", null, LocaleContextHolder.getLocale());
                     model.addAttribute("errorMessage", message);
                     return "userEdit";
-                }*/
+                }
             }
         }
         else {

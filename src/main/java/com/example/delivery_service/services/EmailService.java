@@ -15,13 +15,13 @@ public class EmailService {
 
     private final JavaMailSender emailSender;
     private final MailContentBuilder mailContentBuilder;
-    private final MessageSource messageSource;
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
-    public EmailService(JavaMailSender emailSender, MailContentBuilder mailContentBuilder, MessageSource messageSource) {
+    public EmailService(JavaMailSender emailSender, MailContentBuilder mailContentBuilder) {
         this.emailSender = emailSender;
         this.mailContentBuilder = mailContentBuilder;
-        this.messageSource = messageSource;
     }
 
     public void sendNewOrderMail(String subject, Order order){
