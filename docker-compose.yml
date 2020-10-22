@@ -16,4 +16,4 @@ services:
       - "3306:3306"
     image: mysql:5.7
     environment:
-      - MYSQL_ROOT_PASSWORD=PWD_786215
+      - MYSQL_ROOT_PASSWORD=<password>
